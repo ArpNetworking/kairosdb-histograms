@@ -458,7 +458,7 @@
                   </sources>
                 </mapping>
                 <mapping>
-                  <directory>/opt/kairosdb/config</directory>
+                  <directory>/opt/kairosdb/conf</directory>
                   <sources>
                     <source>
                       <location>config</location>

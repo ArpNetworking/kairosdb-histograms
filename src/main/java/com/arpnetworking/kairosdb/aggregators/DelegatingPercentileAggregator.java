@@ -75,6 +75,6 @@ public final class DelegatingPercentileAggregator extends DelegatingAggregator {
     }
 
     @javax.validation.constraints.Min(0)
-    @javax.validation.constraints.Max(100)
+    @javax.validation.constraints.Max(1)
     private double _percentile = -1d;
 }
