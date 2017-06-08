@@ -20,6 +20,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTimeZone;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
+import org.kairosdb.core.datapoints.DoubleDataPointFactoryImpl;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,12 @@ public class DelegatingAggregator extends RangeAggregator {
     public DataPointGroup aggregate(final DataPointGroup dataPointGroup) {
         final PeekableDataPointGroup wrapped = new PeekableDataPointGroup(dataPointGroup);
         final DataPoint point = wrapped.peek();
-        final String dataType = point.getDataStoreDataType();
+        final String dataType;
+        if (point != null) {
+            dataType = point.getDataStoreDataType();
+        } else {
+            dataType = DoubleDataPointFactoryImpl.DST_DOUBLE;
+        }
 
         final Optional<RangeAggregator> aggregatorOptional = _aggregatorMap.aggregatorForDataStoreDataType(dataType);
         if (!aggregatorOptional.isPresent()) {

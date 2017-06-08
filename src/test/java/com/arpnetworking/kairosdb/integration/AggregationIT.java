@@ -183,6 +183,14 @@ public class AggregationIT {
         testAggregate("merge", MULTI_HIST_TEST_DATA, merged);
     }
 
+    @Test
+    public void testAggregateEmptyResults() throws IOException, JSONException {
+        final String body = queryWithExpectedCode("non_existing_metric", 1000, "sum", Collections.emptyMap(), 200);
+        final JSONObject responseJson = new JSONObject(body);
+        final JSONObject queryObject = responseJson.getJSONArray("queries").getJSONObject(0);
+        Assert.assertEquals(0, queryObject.getInt("sample_size"));
+    }
+
     private Map<String, Double> percentileParam(final double percentile) {
         final HashMap<String, Double> map = Maps.newHashMap();
         map.put("percentile", percentile);
