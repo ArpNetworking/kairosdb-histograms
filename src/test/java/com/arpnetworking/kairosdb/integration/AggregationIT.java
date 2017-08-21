@@ -162,6 +162,35 @@ public class AggregationIT {
         testAggregate("percentile", MULTI_HIST_TEST_DATA, 20d, percentileParam(1.00));
     }
 
+    // ****  apdex aggregator ***
+    @Test
+    public void testApdexRequiresTarget() throws IOException, JSONException {
+        queryWithExpectedCode("metric", 1000, "apdex", Collections.emptyMap(), 400);
+    }
+
+    @Test
+    public void testApdexRequiresTargetInRange() throws IOException, JSONException {
+        queryWithExpectedCode("metric", 1000, "apdex", apdexParam(-5), 400);
+    }
+
+    @Test
+    public void testApdexAggregatorSingle() throws IOException, JSONException {
+        testAggregate("apdex", SINGLE_HIST_TEST_DATA, 0d, apdexParam(0));
+        testAggregate("apdex", SINGLE_HIST_TEST_DATA, 0.3888888888d, apdexParam(1));
+        testAggregate("apdex", SINGLE_HIST_TEST_DATA, 0.7777777777d, apdexParam(5));
+        testAggregate("apdex", SINGLE_HIST_TEST_DATA, 1d, apdexParam(10));
+    }
+
+    @Test
+    public void testApdexAggregatorMulti() throws IOException, JSONException {
+        testAggregate("apdex", MULTI_HIST_TEST_DATA, 0d, apdexParam(0));
+        testAggregate("apdex", MULTI_HIST_TEST_DATA, 0.25d, apdexParam(1));
+        testAggregate("apdex", MULTI_HIST_TEST_DATA, 0.666666666d, apdexParam(5));
+        testAggregate("apdex", MULTI_HIST_TEST_DATA, 0.791666666d, apdexParam(10));
+        testAggregate("apdex", MULTI_HIST_TEST_DATA, 1d, apdexParam(20));
+    }
+
+
     // ****  merge aggregator ***
     @Test
     public void testMergeAggregatorSingle() throws IOException, JSONException {
@@ -194,6 +223,12 @@ public class AggregationIT {
     private Map<String, Double> percentileParam(final double percentile) {
         final HashMap<String, Double> map = Maps.newHashMap();
         map.put("percentile", percentile);
+        return map;
+    }
+
+    private Map<String, Double> apdexParam(final double target) {
+        final HashMap<String, Double> map = Maps.newHashMap();
+        map.put("target", target);
         return map;
     }
 
