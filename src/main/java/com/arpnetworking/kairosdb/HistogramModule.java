@@ -21,6 +21,7 @@ import com.arpnetworking.kairosdb.aggregators.DelegatingMaxAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingMinAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingPercentileAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingSumAggregator;
+import com.arpnetworking.kairosdb.aggregators.HistogramApdexAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramCountAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMaxAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMeanAggregator;
@@ -76,6 +77,7 @@ public class HistogramModule extends AbstractModule {
         bind(HistogramPercentileAggregator.class);
 
         bind(HistogramMergeAggregator.class);
+        bind(HistogramApdexAggregator.class);
     }
 
     @Provides
