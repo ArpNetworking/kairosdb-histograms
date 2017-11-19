@@ -64,9 +64,10 @@ public class DelegatingAggregator extends RangeAggregator {
     @Override
     public DataPointGroup aggregate(final DataPointGroup dataPointGroup) {
         final PeekableDataPointGroup wrapped = new PeekableDataPointGroup(dataPointGroup);
-        final DataPoint point = wrapped.peek();
+
         final String dataType;
-        if (point != null) {
+        if (wrapped.hasNext()) {
+            final DataPoint point = wrapped.peek();
             dataType = point.getDataStoreDataType();
         } else {
             dataType = DoubleDataPointFactoryImpl.DST_DOUBLE;
