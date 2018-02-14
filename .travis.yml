@@ -26,7 +26,9 @@ deploy:
   provider: releases
   api_key:
     secure: rajBgPaGqNyf/uIVu7Ov8DEUzR6zijPQIEmwxjv+jP0AwQojDHsZAx1RPDL0EVymQcOIcccrShZXc7ozUH0F7/ffGU8syWbZG/6gvAN7ISbAI5Rx85j3T4OkFUP0/VxABbKU/oolKYIwFxyZZkUVq1SB8sxutu5+NjCXsT/t6xsJLR+opW6dVOVVwyMbXpiKQTidj718EJPafwLgwQnk52Tamx09jPRvDod+qq0YW8N7z2q04L+HHFhqjKCqMLTnSZG1QRzS+bXgKWHfYaT68+zpVs0mLmKsecGK9nIr+Sd+nhG6omRrb9AJSLXeTN6PokR5Trhb+aRAB5Gv+X7cCuNYixTB/Le0cD4YxEvN5wCE8DH8iVDfgRzv8f0IEKFSq8YcEUvTGj+U8/a6vs/p1gI8SnRpnC0l3kljVJXWSZwaEdw1wGdsCzbN25uPBEV5WgfGQKfMuPts2tDpyQ7dirkI1ZpGXyogAVTXYWdfvQ8lt4rM10b8Y0lF+pcJ8wbrdqW68Wp/WhbX9cXu0tVSbbWSEsJkJSXDoRxHtC74G8PGm8/vmG0s4Hrpub/2oNSSPlARYQmygqZ9MNJPR0F7izU7VvwxwppNEvFI+ruikoZx/RYvIolaPXarkqnqujDNL54uVrRSXjfumQ6Aef9A2k5Hr18Akbc/zHpJSpua2GY=
-  file: target/rpm/kairosdb-histograms/RPMS/noarch/kairosdb-histograms*.rpm
+  file:
+    - target/rpm/kairosdb-histograms/RPMS/noarch/kairosdb-histograms*.rpm
+    - target/kairosdb-histograms*-bin.tgz
   file_glob: true
   skip_cleanup: true
   on:
