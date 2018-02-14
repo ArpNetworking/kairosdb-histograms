@@ -333,7 +333,7 @@ public class AggregationIT {
             final Double number,
             final int expectedCode) throws JSONException, IOException {
         final HttpPost post = KairosHelper.postNumber(timestamp, number, metricName);
-        try (final CloseableHttpResponse response = _client.execute(post)) {
+        try (CloseableHttpResponse response = _client.execute(post)) {
             final String body;
             if (response.getEntity() != null) {
                 body = CharStreams.toString(new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8));
@@ -350,7 +350,7 @@ public class AggregationIT {
             final Histogram histogram,
             final int expectedCode) throws JSONException, IOException {
         final HttpPost post = KairosHelper.postHistogram(timestamp, histogram, metricName);
-        try (final CloseableHttpResponse response = _client.execute(post)) {
+        try (CloseableHttpResponse response = _client.execute(post)) {
             Assert.assertEquals(expectedCode, response.getStatusLine().getStatusCode());
         }
     }
@@ -364,7 +364,7 @@ public class AggregationIT {
             throws JSONException, IOException {
         final JSONObject params = new JSONObject(aggParams);
         final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregator, params);
-        try (final CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
+        try (CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
             final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
             Assert.assertEquals("response: " + body, expectedCode, lookupResponse.getStatusLine().getStatusCode());
             return body;
