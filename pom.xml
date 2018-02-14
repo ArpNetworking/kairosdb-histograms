@@ -198,6 +198,21 @@
               </descriptors>
             </configuration>
           </execution>
+            <execution>
+                <id>bin-assembly</id>
+                <phase>package</phase>
+                <goals>
+                    <goal>single</goal>
+                </goals>
+                <configuration>
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <attach>false</attach>
+                    <tarLongFileMode>posix</tarLongFileMode>
+                    <descriptors>
+                        <descripto>src/main/assembly/bin.xml</descripto>
+                    </descriptors>
+                </configuration>
+            </execution>
         </executions>
       </plugin>
       <plugin>
