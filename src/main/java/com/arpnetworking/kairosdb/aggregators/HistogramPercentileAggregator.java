@@ -21,10 +21,12 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
-import org.kairosdb.core.aggregator.annotation.AggregatorProperty;
+import org.kairosdb.core.annotation.FeatureComponent;
+import org.kairosdb.core.annotation.FeatureProperty;
+import org.kairosdb.core.annotation.ValidationProperty;
 import org.kairosdb.core.datapoints.DoubleDataPointFactory;
 import org.kairosdb.core.exception.KairosDBException;
+import org.kairosdb.core.http.rest.validation.NonZero;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,13 +38,9 @@ import java.util.TreeMap;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "hpercentile",
-        description = "Finds the percentile of the data range.",
-        properties = {
-                @AggregatorProperty(name = "percentile", type = "double")
-        }
-)
+        description = "Finds the percentile of the data range.")
 public final class HistogramPercentileAggregator extends RangeAggregator {
     /**
      * Public constructor.
@@ -74,9 +72,22 @@ public final class HistogramPercentileAggregator extends RangeAggregator {
         return _dataPointFactory.getGroupType();
     }
 
-
-    @javax.validation.constraints.Min(0)
-    @javax.validation.constraints.Max(1)
+    @NonZero
+    @FeatureProperty(
+            label = "Percentile",
+            description = "Data points returned will be in this percentile.",
+            default_value = "0.1",
+            validations =  {
+                    @ValidationProperty(
+                            expression = "value > 0",
+                            message = "Percentile must be greater than 0."
+                    ),
+                    @ValidationProperty(
+                            expression = "value < 1",
+                            message = "Percentile must be smaller than 1."
+                    )
+            }
+    )
     private double _percentile = -1d;
     private final DoubleDataPointFactory _dataPointFactory;
 

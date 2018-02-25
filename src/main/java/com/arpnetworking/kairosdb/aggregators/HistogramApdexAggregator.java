@@ -20,13 +20,16 @@ import com.arpnetworking.kairosdb.HistogramDataPointFactory;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
+import org.kairosdb.core.annotation.FeatureComponent;
+import org.kairosdb.core.annotation.FeatureProperty;
 import org.kairosdb.core.datapoints.DoubleDataPointFactory;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * Aggregator that computes the apdex from a range of histograms.
@@ -34,7 +37,7 @@ import javax.validation.constraints.Min;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "apdex",
         description = "Computes the Apdex score."
 )
@@ -69,7 +72,15 @@ public class HistogramApdexAggregator extends RangeAggregator{
         return _dataPointFactory.getGroupType();
     }
 
+    @Valid
+    @NotNull
     @Min(0)
+    @FeatureProperty(
+            name = "target",
+            label = "Target latency",
+            description = "The Apdex target for latency",
+            default_value = "1"
+    )
     private double _target = -1d;
     private final DoubleDataPointFactory _dataPointFactory;
 

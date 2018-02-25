@@ -20,8 +20,7 @@ import com.arpnetworking.kairosdb.HistogramDataPointFactory;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
-import org.kairosdb.core.aggregator.annotation.AggregatorProperty;
+import org.kairosdb.core.annotation.FeatureComponent;
 import org.kairosdb.core.datapoints.DoubleDataPointFactory;
 import org.kairosdb.core.exception.KairosDBException;
 
@@ -33,14 +32,9 @@ import java.util.Iterator;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "hsum",
-        description = "Adds data points together.",
-        properties = {
-                @AggregatorProperty(name = "sampling", type = "duration"),
-                @AggregatorProperty(name = "align_start_time", type = "boolean")
-        }
-)
+        description = "Adds data points together.")
 public final class HistogramSumAggregator extends RangeAggregator {
     /**
      * Public constructor.

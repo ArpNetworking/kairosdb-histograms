@@ -17,8 +17,7 @@ package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
 import com.google.inject.Inject;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
-import org.kairosdb.core.aggregator.annotation.AggregatorProperty;
+import org.kairosdb.core.annotation.FeatureComponent;
 
 import javax.inject.Named;
 
@@ -27,14 +26,9 @@ import javax.inject.Named;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "max",
-        description = "Returns the maximum value data point for the time range.",
-        properties = {
-                @AggregatorProperty(name = "sampling", type = "duration"),
-                @AggregatorProperty(name = "align_start_time", type = "boolean")
-        }
-)
+        description = "Returns the maximum value data point for the time range.")
 public final class DelegatingMaxAggregator extends DelegatingAggregator {
     /**
      * Public constructor.
