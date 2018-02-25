@@ -18,8 +18,8 @@ package com.arpnetworking.kairosdb;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.kairosdb.core.KairosDataPointFactory;
-import org.kairosdb.core.aggregator.Aggregator;
 import org.kairosdb.core.aggregator.RangeAggregator;
+import org.kairosdb.plugin.Aggregator;
 
 import java.util.List;
 import java.util.Map;

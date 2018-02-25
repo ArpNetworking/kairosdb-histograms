@@ -16,8 +16,7 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
-import org.kairosdb.core.aggregator.annotation.AggregatorProperty;
+import org.kairosdb.core.annotation.FeatureComponent;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,14 +26,9 @@ import javax.inject.Named;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "avg",
-        description = "Computes the mean value of the histograms.",
-        properties = {
-                @AggregatorProperty(name = "sampling", type = "duration"),
-                @AggregatorProperty(name = "align_start_time", type = "boolean")
-        }
-)
+        description = "Computes the mean value of the histograms.")
 public final class DelegatingAvgAggregator extends DelegatingAggregator {
     /**
      * Public constructor.

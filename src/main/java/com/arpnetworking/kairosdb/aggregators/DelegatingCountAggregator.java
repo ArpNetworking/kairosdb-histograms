@@ -17,8 +17,7 @@ package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
 import com.google.inject.Inject;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
-import org.kairosdb.core.aggregator.annotation.AggregatorProperty;
+import org.kairosdb.core.annotation.FeatureComponent;
 
 import javax.inject.Named;
 
@@ -27,13 +26,9 @@ import javax.inject.Named;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "count",
-        description = "Counts the number of data points.",
-        properties = {
-                @AggregatorProperty(name = "sampling", type = "duration"),
-                @AggregatorProperty(name = "align_start_time", type = "boolean")
-        })
+        description = "Counts the number of data points.")
 public final class DelegatingCountAggregator extends DelegatingAggregator {
     /**
      * Public constructor.

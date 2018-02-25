@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
+import org.kairosdb.core.annotation.FeatureComponent;
 import org.kairosdb.core.exception.KairosDBException;
 
 import java.util.Collections;
@@ -34,10 +34,9 @@ import java.util.TreeMap;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "merge",
-        description = "Merges histograms."
-)
+        description = "Merges histograms.")
 public final class HistogramMergeAggregator extends RangeAggregator {
     /**
      * Public constructor.

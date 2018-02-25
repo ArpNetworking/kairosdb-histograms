@@ -19,8 +19,7 @@ import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
 import com.google.inject.Inject;
 import org.kairosdb.core.aggregator.PercentileAggregator;
 import org.kairosdb.core.aggregator.RangeAggregator;
-import org.kairosdb.core.aggregator.annotation.AggregatorName;
-import org.kairosdb.core.aggregator.annotation.AggregatorProperty;
+import org.kairosdb.core.annotation.FeatureComponent;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -32,13 +31,9 @@ import javax.inject.Named;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@AggregatorName(
+@FeatureComponent(
         name = "percentile",
-        description = "Finds the percentile of the data range.",
-        properties = {
-                @AggregatorProperty(name = "percentile", type = "double")
-        }
-)
+        description = "Finds the percentile of the data range.")
 public final class DelegatingPercentileAggregator extends DelegatingAggregator {
     /**
      * Public constructor.
