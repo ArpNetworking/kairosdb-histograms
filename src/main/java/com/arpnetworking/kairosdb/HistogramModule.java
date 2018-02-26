@@ -20,6 +20,7 @@ import com.arpnetworking.kairosdb.aggregators.DelegatingCountAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingMaxAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingMinAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingPercentileAggregator;
+import com.arpnetworking.kairosdb.aggregators.DelegatingStdDevAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingSumAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramApdexAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramCountAggregator;
@@ -28,6 +29,7 @@ import com.arpnetworking.kairosdb.aggregators.HistogramMeanAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMergeAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMinAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramPercentileAggregator;
+import com.arpnetworking.kairosdb.aggregators.HistogramStdDevAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramSumAggregator;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
@@ -42,6 +44,7 @@ import org.kairosdb.core.aggregator.CountAggregator;
 import org.kairosdb.core.aggregator.MaxAggregator;
 import org.kairosdb.core.aggregator.MinAggregator;
 import org.kairosdb.core.aggregator.PercentileAggregator;
+import org.kairosdb.core.aggregator.StdAggregator;
 import org.kairosdb.core.aggregator.SumAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +81,9 @@ public class HistogramModule extends AbstractModule {
 
         bind(HistogramMergeAggregator.class);
         bind(HistogramApdexAggregator.class);
+
+        bind(DelegatingStdDevAggregator.class);
+        bind(HistogramStdDevAggregator.class);
     }
 
     @Provides
@@ -144,6 +150,17 @@ public class HistogramModule extends AbstractModule {
             final Provider<HistogramPercentileAggregator> histProvider,
             final Provider<PercentileAggregator> percentileProvider) {
         return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, percentileProvider));
+    }
+
+    @Provides
+    @Named("dev")
+    @Singleton
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
+    private DelegatingAggregatorMap getStdDevMap(
+            final KairosDataPointFactory factory,
+            final Provider<HistogramStdDevAggregator> histProvider,
+            final Provider<StdAggregator> stdDevProvider) {
+        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, stdDevProvider));
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HistogramModule.class);
