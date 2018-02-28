@@ -28,7 +28,7 @@
   <packaging>jar</packaging>
   <name>KairosDB Histograms</name>
   <description>Histograms for KairosDB.</description>
-  <version>2.0.0</version>
+  <version>2.0.1-SNAPSHOT</version>
 
   <licenses>
     <license>
@@ -66,7 +66,7 @@
     <connection>scm:git:git@github.com:ArpNetworking/kairosdb-histograms.git</connection>
     <developerConnection>scm:git:git@github.com:ArpNetworking/kairosdb-histograms.git</developerConnection>
     <url>https://github.com/arpnetworking/kairosdb-histograms</url>
-    <tag>kairosdb-histograms-2.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
