@@ -126,6 +126,22 @@ public class AggregationIT {
         testAggregate("sum", MULTI_HIST_TEST_DATA, 120d);
     }
 
+    // **** standard deviation aggregator ***
+    @Test
+    public void testStdDevAggregatorSingle() throws IOException, JSONException {
+        testAggregate("dev", SINGLE_HIST_TEST_DATA, Math.sqrt(13d));
+    }
+
+    @Test
+    public void testStdDevAggregatorMulti() throws IOException, JSONException {
+        testAggregate("dev", MULTI_HIST_TEST_DATA, Math.sqrt(628d / 11d));
+    }
+
+    @Test
+    public void testDefaultStdDevAggregator() throws IOException, JSONException {
+        testDoubleAggregate("dev", DOUBLE_TEST_DATA, Math.sqrt(13d));
+    }
+
     // ****  percentile aggregator ***
     @Test
     public void testPercentileRequiresPercentile() throws IOException, JSONException {
