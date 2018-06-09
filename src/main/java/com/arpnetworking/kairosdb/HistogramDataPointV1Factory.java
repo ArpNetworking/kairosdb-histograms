@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Factory that creates {@link HistogramDataPointImpl}.
+ * Factory that creates {@link HistogramDataPointV1Impl}.
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class HistogramDataPointFactory implements DataPointFactory{
+public class HistogramDataPointV1Factory implements DataPointFactory {
     /**
      * Name of the Data Store Type.
      */
@@ -43,9 +43,7 @@ public class HistogramDataPointFactory implements DataPointFactory{
     /**
      * Default constructor.
      */
-    public HistogramDataPointFactory() {
-//        LOGGER.info("HDPF online and ready");
-    }
+    public HistogramDataPointV1Factory() { }
 
     @Override
     public String getDataStoreType() {
@@ -58,7 +56,7 @@ public class HistogramDataPointFactory implements DataPointFactory{
     }
 
     @Override
-    public DataPoint getDataPoint(final long timestamp, final JsonElement json) throws IOException {
+    public DataPoint getDataPoint(final long timestamp, final JsonElement json) {
         final TreeMap<Double, Integer> binValues = new TreeMap<>();
 
         final JsonObject object = json.getAsJsonObject();
@@ -72,7 +70,7 @@ public class HistogramDataPointFactory implements DataPointFactory{
             binValues.put(Double.parseDouble(entry.getKey()), entry.getValue().getAsInt());
         }
 
-        return new HistogramDataPointImpl(timestamp, 7, binValues, min, max, mean, sum);
+        return new HistogramDataPointV1Impl(timestamp, 7, binValues, min, max, mean, sum);
     }
 
     @Override
@@ -87,7 +85,8 @@ public class HistogramDataPointFactory implements DataPointFactory{
         final double max = buffer.readDouble();
         final double mean = buffer.readDouble();
         final double sum = buffer.readDouble();
+        final int precision = 7;
 
-        return new HistogramDataPointImpl(timestamp, 7, bins, min, max, mean, sum);
+        return new HistogramDataPointV1Impl(timestamp, precision, bins, min, max, mean, sum);
     }
 }

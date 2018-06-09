@@ -29,7 +29,7 @@ import java.util.TreeMap;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class HistogramDataPointImpl extends DataPointHelper implements HistogramDataPoint {
+public class HistogramDataPointV1Impl extends DataPointHelper implements HistogramDataPoint {
     private static final String API_TYPE = "histogram";
     private final int _precision;
     private final TreeMap<Double, Integer> _map;
@@ -49,7 +49,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
      * @param mean the mean value in the histogram
      * @param sum the sum of all the values in the histogram
      */
-    public HistogramDataPointImpl(
+    public HistogramDataPointV1Impl(
             final long timestamp,
             final int precision,
             final TreeMap<Double, Integer> map,
@@ -91,6 +91,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         writer.key("max").value(_max);
         writer.key("mean").value(_mean);
         writer.key("sum").value(_sum);
+        writer.key("precision").value(_precision);
         writer.endObject();
     }
 
@@ -101,7 +102,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
 
     @Override
     public String getDataStoreDataType() {
-        return HistogramDataPointFactory.DST;
+        return HistogramDataPointV1Factory.DST;
     }
 
     @Override
@@ -124,11 +125,11 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         return 0;
     }
 
-    /**
-     * Gets the number of samples in the bins.
-     *
-     * @return the number of samples
-     */
+    @Override
+    public int getPrecision() {
+        return _precision;
+    }
+
     @Override
     public int getSampleCount() {
         int count = 0;
