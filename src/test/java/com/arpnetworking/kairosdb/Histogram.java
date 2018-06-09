@@ -36,6 +36,7 @@ public class Histogram {
     private double _max;
     private double _sum;
     private int _count;
+    private byte _precision;
 
     /**
      * Public constructor.
@@ -54,6 +55,7 @@ public class Histogram {
             _bins.compute(Math.floor(number), (i, j) -> j == null ? 1 : j + 1);
             _count++;
         }
+        _precision = 7;
     }
 
     /**
@@ -67,6 +69,7 @@ public class Histogram {
         _min = json.getDouble("min");
         _max = json.getDouble("max");
         _sum = json.getDouble("sum");
+        _precision = (byte) json.getInt("precision");
         final JSONObject binsJson = json.getJSONObject("bins");
         for (final Iterator<String> it = (Iterator<String>) binsJson.keys(); it.hasNext();) {
             final String key = it.next();
@@ -89,6 +92,7 @@ public class Histogram {
                     && other._count == _count
                     && other._max == _max
                     && other._min == _min
+                    && other._precision == _precision
                     && other._sum == _sum;
         } else {
             return false;
@@ -97,7 +101,7 @@ public class Histogram {
 
     @Override
     public int hashCode() {
-        return Objects.hash(_bins, _count, _min, _max, _sum);
+        return Objects.hash(_bins, _count, _min, _max, _sum, _precision);
     }
 
     @Override
@@ -107,6 +111,7 @@ public class Histogram {
                 .add("max", _max)
                 .add("sum", _sum)
                 .add("count", _count)
+                .add("precision", _precision)
                 .add("bins", _bins)
                 .toString();
     }
@@ -123,6 +128,7 @@ public class Histogram {
                 .put("mean", _sum / _count)
                 .put("min", _min)
                 .put("max", _max)
+                .put("precision", _precision)
                 .put("sum", _sum);
         return histogram;
     }
@@ -141,6 +147,14 @@ public class Histogram {
 
     public double getSum() {
         return _sum;
+    }
+
+    public void setPrecision(final byte precision) {
+        _precision = precision;
+    }
+
+    public byte getPrecision() {
+        return _precision;
     }
 
     public TreeMap<Double, Integer> getBins() {

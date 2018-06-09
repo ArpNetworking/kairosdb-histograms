@@ -68,7 +68,8 @@ public class HistogramModule extends AbstractModule {
     @Override
     protected void configure() {
         LOGGER.info("Binding HistogramModule");
-        bind(HistogramDataPointFactory.class).in(Scopes.SINGLETON);
+        bind(HistogramDataPointV2Factory.class).in(Scopes.SINGLETON);
+        bind(HistogramDataPointV1Factory.class).in(Scopes.SINGLETON);
 
         bind(DelegatingAvgAggregator.class);
         bind(HistogramMeanAggregator.class);
