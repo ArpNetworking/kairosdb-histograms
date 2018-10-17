@@ -50,7 +50,7 @@ public class MovingWindowAggregator extends RangeAggregator {
      * @param timestamp
      * @return
      */
-    // @SuppressWarnings("fallthrough")
+    @SuppressWarnings("fallthrough")
     private long alignRangeBoundary(long timestamp) {
         DateTime dt = new DateTime(timestamp, m_timeZone);
         TimeUnit tu = m_sampling.getUnit();
