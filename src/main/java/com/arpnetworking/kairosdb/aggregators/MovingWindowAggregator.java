@@ -1,5 +1,21 @@
+/**
+ * Copyright 2018 Dropbox Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.arpnetworking.kairosdb.aggregators;
 
+import com.google.common.base.Preconditions;
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
@@ -9,33 +25,36 @@ import org.json.JSONException;
 import org.json.JSONWriter;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.AggregatedDataPointGroupWrapper;
+import org.kairosdb.core.aggregator.RangeAggregator;
 import org.kairosdb.core.annotation.FeatureComponent;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.core.datastore.TimeUnit;
-import org.kairosdb.core.aggregator.RangeAggregator;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+/**
+ * Aggregator that takes a window of datapoints and emits them to downstream aggregators as if they came from the
+ * end time of the window.  This allows for generically doing things like a moving average or percentile over a 
+ * moving/rolling period of time.
+ * 
+ * @author Gil Markham (gmarkham@dropbox.com)
+ */
 @FeatureComponent(name = "movingWindow", description = "Creates a moving window of datapoints")
 public class MovingWindowAggregator extends RangeAggregator {
-    protected long m_startTime = 0L;
-    protected DateTimeZone m_timeZone = DateTimeZone.UTC;
-    protected boolean m_alignSampling = false;
-
-    public MovingWindowAggregator() {
-
-    }
+    protected long _startTime = 0L;
+    protected DateTimeZone _timeZone = DateTimeZone.UTC;
+    protected boolean _alignSampling = false;
 
     @Override
-    public DataPointGroup aggregate(DataPointGroup dataPointGroup) {
-        checkNotNull(dataPointGroup);
+    public DataPointGroup aggregate(final DataPointGroup dataPointGroup) {
+        Preconditions.checkNotNull(dataPointGroup);
 
-        if (m_alignSampling)
-            m_startTime = alignRangeBoundary(m_startTime);
+        if (_alignSampling) {
+            _startTime = alignRangeBoundary(_startTime);
+        }
         return new MovingWindowDataPointGroup(dataPointGroup);
     }
 
@@ -51,9 +70,9 @@ public class MovingWindowAggregator extends RangeAggregator {
      * @return
      */
     @SuppressWarnings("fallthrough")
-    private long alignRangeBoundary(long timestamp) {
-        DateTime dt = new DateTime(timestamp, m_timeZone);
-        TimeUnit tu = m_sampling.getUnit();
+    private long alignRangeBoundary(final long timestamp) {
+        DateTime dt = new DateTime(timestamp, _timeZone);
+        final TimeUnit tu = m_sampling.getUnit();
         switch (tu) {
         case YEARS:
             dt = dt.withDayOfYear(1).withMillisOfDay(0);
@@ -79,129 +98,136 @@ public class MovingWindowAggregator extends RangeAggregator {
     }
 
     @Override
-    public boolean canAggregate(String groupType) {
+    public boolean canAggregate(final String groupType) {
         return true;
     }
 
     @Override
-    public String getAggregatedGroupType(String groupType) {
+    public String getAggregatedGroupType(final String groupType) {
         return groupType;
     }
 
     @Override
-    public void setStartTime(long startTime) {
-        m_startTime = startTime;
+    public void setStartTime(final long startTime) {
+        _startTime = startTime;
         super.setStartTime(startTime);
     }
 
     @Override
-    public void setTimeZone(DateTimeZone timeZone) {
-        m_timeZone = timeZone;
+    public void setTimeZone(final DateTimeZone timeZone) {
+        _timeZone = timeZone;
         super.setTimeZone(timeZone);
     }
 
     @Override
-    public void setAlignSampling(boolean alignSampling) {
-        m_alignSampling = alignSampling;
+    public void setAlignSampling(final boolean alignSampling) {
+        _alignSampling = alignSampling;
         super.setAlignSampling(alignSampling);
     }
 
+    @Override
+    protected RangeSubAggregator getSubAggregator() {
+        return null;
+    }
+
     private class MovingWindowDataPointGroup extends AggregatedDataPointGroupWrapper {
-        protected DateTimeField m_unitField;
-        protected ConcurrentSkipListMap<Long, DataPoint> m_dpBuffer;
-        protected Iterator<DataPoint> m_dpIterator = null;
-        protected long m_currentRangeTime;
+        protected DateTimeField _unitField;
+        protected ConcurrentSkipListMap<Long, DataPoint> _dpBuffer;
+        protected Iterator<DataPoint> _dpIterator = null;
+        protected long _currentRangeTime;
 
-        MovingWindowDataPointGroup(DataPointGroup dataPointGroup) {
+        MovingWindowDataPointGroup(final DataPointGroup dataPointGroup) {
             super(dataPointGroup);
-            m_dpBuffer = new ConcurrentSkipListMap<>();
-            m_dpIterator = m_dpBuffer.values().iterator();
+            _dpBuffer = new ConcurrentSkipListMap<>();
+            _dpIterator = _dpBuffer.values().iterator();
 
-            Chronology chronology = GregorianChronology.getInstance(m_timeZone);
+            final Chronology chronology = GregorianChronology.getInstance(_timeZone);
 
-            TimeUnit tu = m_sampling.getUnit();
+            final TimeUnit tu = m_sampling.getUnit();
             switch (tu) {
             case YEARS:
-                m_unitField = chronology.year();
+                _unitField = chronology.year();
                 break;
             case MONTHS:
-                m_unitField = chronology.monthOfYear();
+                _unitField = chronology.monthOfYear();
                 break;
             case WEEKS:
-                m_unitField = chronology.weekOfWeekyear();
+                _unitField = chronology.weekOfWeekyear();
                 break;
             case DAYS:
-                m_unitField = chronology.dayOfMonth();
+                _unitField = chronology.dayOfMonth();
                 break;
             case HOURS:
-                m_unitField = chronology.hourOfDay();
+                _unitField = chronology.hourOfDay();
                 break;
             case MINUTES:
-                m_unitField = chronology.minuteOfHour();
+                _unitField = chronology.minuteOfHour();
                 break;
             case SECONDS:
-                m_unitField = chronology.secondOfDay();
+                _unitField = chronology.secondOfDay();
                 break;
             default:
-                m_unitField = chronology.millisOfSecond();
+                _unitField = chronology.millisOfSecond();
                 break;
             }
         }
 
-        protected long getStartRange(long timestamp) {
-            long samplingValue = m_sampling.getValue();
-            long difference = m_unitField.getDifferenceAsLong(timestamp, m_startTime);
-            if (m_unitField.remainder(timestamp - m_startTime) > 0) {
+        protected long getStartRange(final long timestamp) {
+            final long samplingValue = m_sampling.getValue();
+            long difference = _unitField.getDifferenceAsLong(timestamp, _startTime);
+            if (_unitField.remainder(timestamp - _startTime) > 0) {
                 difference += 1;
             }
-            return m_unitField.add(m_startTime, difference + -1 * samplingValue);
+            return _unitField.add(_startTime, difference + -1 * samplingValue);
         }
 
-        protected long getEndRange(long timestamp) {
-            long difference = m_unitField.getDifferenceAsLong(timestamp, m_startTime);
-            return m_unitField.add(m_startTime, difference) - 1;
+        protected long getEndRange(final long timestamp) {
+            final long difference = _unitField.getDifferenceAsLong(timestamp, _startTime);
+            // Subract one millisecond off the resulting time, so the endRange doesn't overlap
+            // with the next startRange
+            return _unitField.add(_startTime, difference) - 1;
         }
 
         @Override
         public DataPoint next() {
-            if (m_dpBuffer.isEmpty() || !m_dpIterator.hasNext()) {
+            if (_dpBuffer.isEmpty() || !_dpIterator.hasNext()) {
 
                 // We calculate start and end ranges as the ranges may not be
                 // consecutive if data does not show up in each range.
-                long startRange; 
+                final long startRange; 
 
-                if (m_dpBuffer.isEmpty()) {
+                if (_dpBuffer.isEmpty()) {
                     // This is the first datapoint so front-load the sample window amount of data.
-                    startRange = m_startTime;
+                    startRange = _startTime;
                 } else {
                     startRange = getStartRange(currentDataPoint.getTimestamp());
                 }
 
-                long endRange = m_unitField.add(startRange, m_sampling.getValue());
-                m_currentRangeTime = endRange;
+                final long endRange = _unitField.add(startRange, m_sampling.getValue());
+                _currentRangeTime = endRange;
 
                 // Trim off any data that is too old
-                m_dpBuffer = new ConcurrentSkipListMap<>(m_dpBuffer.tailMap(startRange, false));
+                _dpBuffer = new ConcurrentSkipListMap<>(_dpBuffer.tailMap(startRange, false));
 
                 // Add data up until the end of the range
                 while (currentDataPoint != null && currentDataPoint.getTimestamp() <= endRange) {
                     if (currentDataPoint.getTimestamp() > startRange) {
-                        m_dpBuffer.put(currentDataPoint.getTimestamp(), currentDataPoint);
+                        _dpBuffer.put(currentDataPoint.getTimestamp(), currentDataPoint);
                     }
                     if (hasNextInternal()) {
                         currentDataPoint = nextInternal();
                     }
                 }
 
-                m_dpIterator = m_dpBuffer.values().iterator();
+                _dpIterator = _dpBuffer.values().iterator();
             }
 
-            return new DataPointWrapper(m_currentRangeTime, m_dpIterator.next());
+            return new DataPointWrapper(_currentRangeTime, _dpIterator.next());
         }
 
         @Override
         public boolean hasNext() {
-            return m_dpIterator.hasNext() || super.hasNext();
+            return _dpIterator.hasNext() || super.hasNext();
         }
 
         /**
@@ -222,73 +248,71 @@ public class MovingWindowAggregator extends RangeAggregator {
         }
     }
 
-    @Override
-    protected RangeSubAggregator getSubAggregator() {
-        return null;
-    }
-
+    /**
+     * Class to wrap a Datapoint so that the timestamp can be masked and overwritten.
+     */
     protected static class DataPointWrapper implements DataPoint {
-        protected DataPoint m_wrappedDataPoint;
-        protected long m_timestamp;
+        protected DataPoint _wrappedDataPoint;
+        protected long _timestamp;
 
-        DataPointWrapper(long timestamp, DataPoint dataPoint) {
-            m_timestamp = timestamp;
-            m_wrappedDataPoint = dataPoint;
+        DataPointWrapper(final long timestamp, final DataPoint dataPoint) {
+            _timestamp = timestamp;
+            _wrappedDataPoint = dataPoint;
         }
 
         @Override
         public long getTimestamp() {
-            return m_timestamp;
+            return _timestamp;
         }
 
         @Override
-        public void writeValueToBuffer(DataOutput buffer) throws IOException {
-            m_wrappedDataPoint.writeValueToBuffer(buffer);
+        public void writeValueToBuffer(final DataOutput buffer) throws IOException {
+            _wrappedDataPoint.writeValueToBuffer(buffer);
         }
 
         @Override
-        public void writeValueToJson(JSONWriter writer) throws JSONException {
-            m_wrappedDataPoint.writeValueToJson(writer);
+        public void writeValueToJson(final JSONWriter writer) throws JSONException {
+            _wrappedDataPoint.writeValueToJson(writer);
         }
 
         @Override
         public String getApiDataType() {
-            return m_wrappedDataPoint.getApiDataType();
+            return _wrappedDataPoint.getApiDataType();
         }
 
         @Override
         public String getDataStoreDataType() {
-            return m_wrappedDataPoint.getDataStoreDataType();
+            return _wrappedDataPoint.getDataStoreDataType();
         }
 
         @Override
         public boolean isLong() {
-            return m_wrappedDataPoint.isLong();
+            return _wrappedDataPoint.isLong();
         }
 
         @Override
         public long getLongValue() {
-            return m_wrappedDataPoint.getLongValue();
+            return _wrappedDataPoint.getLongValue();
         }
 
         @Override
         public boolean isDouble() {
-            return m_wrappedDataPoint.isDouble();
+            return _wrappedDataPoint.isDouble();
         }
 
         @Override
         public double getDoubleValue() {
-            return m_wrappedDataPoint.getDoubleValue();
+            return _wrappedDataPoint.getDoubleValue();
         }
 
         @Override
         public DataPointGroup getDataPointGroup() {
-            return m_wrappedDataPoint.getDataPointGroup();
+            return _wrappedDataPoint.getDataPointGroup();
         }
 
         @Override
-        public void setDataPointGroup(DataPointGroup dataPointGroup) {
-            m_wrappedDataPoint.setDataPointGroup(dataPointGroup);
+        public void setDataPointGroup(final DataPointGroup dataPointGroup) {
+            _wrappedDataPoint.setDataPointGroup(dataPointGroup);
         }
     }
 }
