@@ -19,6 +19,7 @@ import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.datastore.AbstractDataPointGroup;
 import org.kairosdb.core.datastore.Order;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,7 +89,10 @@ public class ListDataPointGroup extends AbstractDataPointGroup {
 
     }
 
-    private class DataPointComparator implements Comparator<DataPoint> {
+    private static class DataPointComparator implements Comparator<DataPoint>, Serializable {
+
+        private static final long serialVersionUID = -3986265694230498036L;
+
         @Override
         public int compare(final DataPoint point1, final DataPoint point2) {
             long ret = point1.getTimestamp() - point2.getTimestamp();

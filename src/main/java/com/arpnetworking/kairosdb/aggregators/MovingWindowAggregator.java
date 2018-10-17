@@ -182,10 +182,9 @@ public class MovingWindowAggregator extends RangeAggregator {
         }
 
         protected long getEndRange(final long timestamp) {
-            final long difference = _unitField.getDifferenceAsLong(timestamp, _startTime);
             // Subract one millisecond off the resulting time, so the endRange doesn't overlap
             // with the next startRange
-            return _unitField.add(_startTime, difference) - 1;
+            return _unitField.add(getStartRange(timestamp), 1) - 1;
         }
 
         @Override
@@ -228,23 +227,6 @@ public class MovingWindowAggregator extends RangeAggregator {
         @Override
         public boolean hasNext() {
             return _dpIterator.hasNext() || super.hasNext();
-        }
-
-        /**
-         * Computes the data point time for the aggregated value. Different strategies
-         * could be added here such as datapoint time = range start time = range end
-         * time = range median = current datapoint time
-         *
-         * @return
-         */
-        private long getDataPointTime() {
-            long datapointTime = currentDataPoint.getTimestamp();
-            if (m_alignStartTime) {
-                datapointTime = getStartRange(datapointTime);
-            } else if (m_alignEndTime) {
-                datapointTime = getEndRange(datapointTime);
-            }
-            return datapointTime;
         }
     }
 
