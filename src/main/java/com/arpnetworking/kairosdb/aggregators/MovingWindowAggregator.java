@@ -66,8 +66,8 @@ public class MovingWindowAggregator extends RangeAggregator {
      * SECONDS, Computes the timestamp of the first millisecond of the second of the
      * timestamp. For MILLISECONDS, returns the timestamp
      *
-     * @param timestamp
-     * @return
+     * @param timestamp Timestamp in milliseconds to use as a basis for range alignment
+     * @return timestamp aligned to the configured sampling unit
      */
     @SuppressWarnings("fallthrough")
     private long alignRangeBoundary(final long timestamp) {
