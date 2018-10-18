@@ -32,6 +32,15 @@ import java.util.TreeMap;
  */
 public class HistogramDataPointFactory implements DataPointFactory{
     /**
+     * Name of the Data Store Type.
+     */
+    public static final String DST = "kairos_histogram_v1";
+    /**
+     * Name of the group type.
+     */
+    public static final String GROUP_TYPE = "histogram";
+
+    /**
      * Default constructor.
      */
     public HistogramDataPointFactory() {
@@ -81,13 +90,4 @@ public class HistogramDataPointFactory implements DataPointFactory{
 
         return new HistogramDataPoint(timestamp, 7, bins, min, max, mean, sum);
     }
-
-    /**
-     * Name of the Data Store Type.
-     */
-    public static final String DST = "kairos_histogram_v1";
-    /**
-     * Name of the group type.
-     */
-    public static final String GROUP_TYPE = "histogram";
 }

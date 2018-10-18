@@ -29,6 +29,19 @@ import java.util.function.Consumer;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class PeekableDataPointGroup implements DataPointGroup {
+    private final DataPointGroup _wrapped;
+    private DataPoint _peeked = null;
+    private boolean _havePeeked = false;
+
+    /**
+     * Public constructor.
+     *
+     * @param wrapped The {@link DataPointGroup} to wrap.
+     */
+    public PeekableDataPointGroup(final DataPointGroup wrapped) {
+        _wrapped = wrapped;
+    }
+
     @Override
     public String getName() {
         return _wrapped.getName();
@@ -96,17 +109,4 @@ public class PeekableDataPointGroup implements DataPointGroup {
     public Set<String> getTagValues(final String tag) {
         return _wrapped.getTagValues(tag);
     }
-
-    /**
-     * Public constructor.
-     *
-     * @param wrapped The {@link DataPointGroup} to wrap.
-     */
-    public PeekableDataPointGroup(final DataPointGroup wrapped) {
-        _wrapped = wrapped;
-    }
-
-    private DataPoint _peeked = null;
-    private boolean _havePeeked = false;
-    private final DataPointGroup _wrapped;
 }

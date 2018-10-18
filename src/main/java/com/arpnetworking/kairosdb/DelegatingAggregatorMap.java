@@ -32,6 +32,11 @@ import javax.inject.Provider;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class DelegatingAggregatorMap {
+    private final List<Provider<? extends RangeAggregator>> _providers;
+    private final Map<String, Optional<Provider<? extends RangeAggregator>>> _groupMap = Maps.newConcurrentMap();
+    private final Map<String, Optional<Provider<? extends RangeAggregator>>> _datastoreDataTypeMap = Maps.newConcurrentMap();
+    private final KairosDataPointFactory _dataPointFactory;
+
     /**
      * Public constructor.
      *
@@ -79,9 +84,4 @@ public class DelegatingAggregatorMap {
         }
         return Optional.empty();
     }
-
-    private final List<Provider<? extends RangeAggregator>> _providers;
-    private final Map<String, Optional<Provider<? extends RangeAggregator>>> _groupMap = Maps.newConcurrentMap();
-    private final Map<String, Optional<Provider<? extends RangeAggregator>>> _datastoreDataTypeMap = Maps.newConcurrentMap();
-    private final KairosDataPointFactory _dataPointFactory;
 }

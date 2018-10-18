@@ -36,6 +36,8 @@ import java.util.Iterator;
         name = "hcount",
         description = "Counts the number of data points.")
 public final class HistogramCountAggregator extends RangeAggregator {
+    private final DoubleDataPointFactory _dataPointFactory;
+
     /**
      * Public constructor.
      *
@@ -61,8 +63,6 @@ public final class HistogramCountAggregator extends RangeAggregator {
     public String getAggregatedGroupType(final String groupType) {
         return _dataPointFactory.getGroupType();
     }
-
-    private final DoubleDataPointFactory _dataPointFactory;
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
 

@@ -30,6 +30,14 @@ import java.util.TreeMap;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class HistogramDataPoint extends DataPointHelper {
+    private static final String API_TYPE = "histogram";
+    private final int _precision;
+    private final TreeMap<Double, Integer> _map;
+    private final double _min;
+    private final double _max;
+    private final double _mean;
+    private final double _sum;
+
     /**
      * Public constructor.
      *
@@ -138,13 +146,4 @@ public class HistogramDataPoint extends DataPointHelper {
     public TreeMap<Double, Integer> getMap() {
         return _map;
     }
-
-    private final int _precision;
-    private final TreeMap<Double, Integer> _map;
-    private final double _min;
-    private final double _max;
-    private final double _mean;
-    private final double _sum;
-
-    private static final String API_TYPE = "histogram";
 }

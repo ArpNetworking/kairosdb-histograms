@@ -38,6 +38,8 @@ import java.util.TreeMap;
         name = "hdev",
         description = "Computes the standard deviation value of the histograms.")
 public class HistogramStdDevAggregator extends RangeAggregator {
+    private final DoubleDataPointFactory _dataPointFactory;
+
     /**
      * Public constructor.
      *
@@ -63,8 +65,6 @@ public class HistogramStdDevAggregator extends RangeAggregator {
     public String getAggregatedGroupType(final String groupType) {
         return _dataPointFactory.getGroupType();
     }
-
-    private final DoubleDataPointFactory _dataPointFactory;
 
     private final class HistogramStdDevDataPointAggregator implements RangeSubAggregator {
 

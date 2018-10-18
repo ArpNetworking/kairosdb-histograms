@@ -31,6 +31,12 @@ import java.util.TreeMap;
  */
 @SuppressFBWarnings("FE_FLOATING_POINT_EQUALITY")
 public class Histogram {
+    private final TreeMap<Double, Integer> _bins = new TreeMap<>();
+    private double _min;
+    private double _max;
+    private double _sum;
+    private int _count;
+
     /**
      * Public constructor.
      *
@@ -141,11 +147,4 @@ public class Histogram {
     public TreeMap<Double, Integer> getBins() {
         return _bins;
     }
-
-    private double _min;
-    private double _max;
-    private double _sum;
-    private int _count;
-
-    private final TreeMap<Double, Integer> _bins = new TreeMap<>();
 }

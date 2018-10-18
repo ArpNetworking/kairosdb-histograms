@@ -35,6 +35,10 @@ import javax.inject.Named;
         name = "percentile",
         description = "Finds the percentile of the data range.")
 public final class DelegatingPercentileAggregator extends DelegatingAggregator {
+    @javax.validation.constraints.Min(0)
+    @javax.validation.constraints.Max(1)
+    private double _percentile = -1d;
+
     /**
      * Public constructor.
      *
@@ -48,7 +52,6 @@ public final class DelegatingPercentileAggregator extends DelegatingAggregator {
     public void setPercentile(final double percentile) {
         _percentile = percentile;
     }
-
 
     @Override
     protected void setProperties(final RangeAggregator aggregator) {
@@ -68,8 +71,4 @@ public final class DelegatingPercentileAggregator extends DelegatingAggregator {
             }
         }
     }
-
-    @javax.validation.constraints.Min(0)
-    @javax.validation.constraints.Max(1)
-    private double _percentile = -1d;
 }
