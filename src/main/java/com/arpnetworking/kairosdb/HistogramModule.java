@@ -56,6 +56,8 @@ import javax.inject.Provider;
  */
 @SuppressWarnings("unchecked")
 public class HistogramModule extends AbstractModule {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramModule.class);
+
     @Override
     protected void configure() {
         LOGGER.info("Binding HistogramModule");
@@ -162,6 +164,4 @@ public class HistogramModule extends AbstractModule {
             final Provider<StdAggregator> stdDevProvider) {
         return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, stdDevProvider));
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HistogramModule.class);
 }

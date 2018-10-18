@@ -36,6 +36,8 @@ import java.util.Iterator;
         name = "hmin",
         description = "Returns the minimum value data point for the time range.")
 public final class HistogramMinAggregator extends RangeAggregator {
+    private final DoubleDataPointFactory _dataPointFactory;
+
     /**
      * Public constructor.
      *
@@ -61,8 +63,6 @@ public final class HistogramMinAggregator extends RangeAggregator {
     public String getAggregatedGroupType(final String groupType) {
         return _dataPointFactory.getGroupType();
     }
-
-    private final DoubleDataPointFactory _dataPointFactory;
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
         @Override

@@ -46,6 +46,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class AggregationIT {
+    private static final AtomicInteger TEST_NUMBER = new AtomicInteger(1);
+    private static final List<Histogram> SINGLE_HIST_TEST_DATA = Lists.newArrayList(
+            new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d)));
+    private static final List<Double> DOUBLE_TEST_DATA = Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d);
+    private static final List<Histogram> MULTI_HIST_TEST_DATA = Lists.newArrayList(
+            new Histogram(Arrays.asList(9d, 1d, 9d, 1d, 8d, 12d)),
+            new Histogram(Arrays.asList(18d, 2d, 18d, 2d, 20d, 20d)));
+    private final CloseableHttpClient _client = HttpClients.createDefault();
+
     // ****  avg aggregator ***
     @Test
     public void testDefaultMeanAggregator() throws IOException, JSONException {
@@ -205,7 +214,6 @@ public class AggregationIT {
         testAggregate("apdex", MULTI_HIST_TEST_DATA, 0.791666666d, apdexParam(10));
         testAggregate("apdex", MULTI_HIST_TEST_DATA, 1d, apdexParam(20));
     }
-
 
     // ****  merge aggregator ***
     @Test
@@ -386,17 +394,4 @@ public class AggregationIT {
             return body;
         }
     }
-
-    private final CloseableHttpClient _client = HttpClients.createDefault();
-
-    private static final AtomicInteger TEST_NUMBER = new AtomicInteger(1);
-
-    private static final List<Histogram> SINGLE_HIST_TEST_DATA = Lists.newArrayList(
-            new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d)));
-
-    private static final List<Double> DOUBLE_TEST_DATA = Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d);
-
-    private static final List<Histogram> MULTI_HIST_TEST_DATA = Lists.newArrayList(
-            new Histogram(Arrays.asList(9d, 1d, 9d, 1d, 8d, 12d)),
-            new Histogram(Arrays.asList(18d, 2d, 18d, 2d, 20d, 20d)));
 }

@@ -39,6 +39,8 @@ import java.util.Arrays;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class StorageIT {
+    private final CloseableHttpClient _client = HttpClients.createDefault();
+
     @Test
     public void testStoreDataPoint() throws IOException, JSONException {
         final Histogram histogram = new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d));
@@ -63,6 +65,4 @@ public class StorageIT {
         final Histogram returnHistogram = new Histogram(histogramJson);
         Assert.assertEquals(histogram, returnHistogram);
     }
-
-    private final CloseableHttpClient _client = HttpClients.createDefault();
 }

@@ -34,6 +34,12 @@ import javax.inject.Provider;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class DelegatingAggregator extends RangeAggregator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingAggregator.class);
+    private final DelegatingAggregatorMap _aggregatorMap;
+    private boolean _sampleAlign;
+    private long _startTime;
+    private DateTimeZone _timeZone = DateTimeZone.UTC;
+
     /**
      * Public constructor.
      *
@@ -116,11 +122,4 @@ public class DelegatingAggregator extends RangeAggregator {
         }
         throw new IllegalArgumentException("Cannot aggregate a " + groupType);
     }
-
-    private final DelegatingAggregatorMap _aggregatorMap;
-    private boolean _sampleAlign;
-    private long _startTime;
-    private DateTimeZone _timeZone = DateTimeZone.UTC;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingAggregator.class);
 }

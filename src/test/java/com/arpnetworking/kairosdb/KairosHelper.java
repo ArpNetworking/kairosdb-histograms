@@ -30,6 +30,8 @@ import java.io.UnsupportedEncodingException;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public final class KairosHelper {
+    private KairosHelper() { }
+
     /**
      * Creates the JSON body for a datapoint POST.
      *
@@ -197,6 +199,4 @@ public final class KairosHelper {
         post.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         return post;
     }
-
-    private KairosHelper() { }
 }

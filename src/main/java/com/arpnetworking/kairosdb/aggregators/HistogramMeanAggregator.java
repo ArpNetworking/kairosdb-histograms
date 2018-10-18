@@ -36,6 +36,8 @@ import java.util.Iterator;
         name = "havg",
         description = "Computes the mean value of the histograms.")
 public final class HistogramMeanAggregator extends RangeAggregator {
+    private final DoubleDataPointFactory _dataPointFactory;
+
     /**
      * Public constructor.
      *
@@ -61,8 +63,6 @@ public final class HistogramMeanAggregator extends RangeAggregator {
     public String getAggregatedGroupType(final String groupType) {
         return _dataPointFactory.getGroupType();
     }
-
-    private final DoubleDataPointFactory _dataPointFactory;
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
         @Override

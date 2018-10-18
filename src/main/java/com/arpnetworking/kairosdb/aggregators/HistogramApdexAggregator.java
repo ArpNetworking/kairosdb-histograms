@@ -42,6 +42,18 @@ import javax.validation.constraints.NotNull;
         description = "Computes the Apdex score."
 )
 public class HistogramApdexAggregator extends RangeAggregator{
+    private final DoubleDataPointFactory _dataPointFactory;
+    @Valid
+    @NotNull
+    @Min(0)
+    @FeatureProperty(
+            name = "target",
+            label = "Target latency",
+            description = "The Apdex target for latency",
+            default_value = "1"
+    )
+    private double _target = -1d;
+
     /**
      * Public constructor.
      *
@@ -71,19 +83,6 @@ public class HistogramApdexAggregator extends RangeAggregator{
     public String getAggregatedGroupType(final String groupType) {
         return _dataPointFactory.getGroupType();
     }
-
-    @Valid
-    @NotNull
-    @Min(0)
-    @FeatureProperty(
-            name = "target",
-            label = "Target latency",
-            description = "The Apdex target for latency",
-            default_value = "1"
-    )
-    private double _target = -1d;
-    private final DoubleDataPointFactory _dataPointFactory;
-
 
     private final class HistogramApdexDataPointAggregator implements RangeSubAggregator {
 
