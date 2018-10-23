@@ -18,5 +18,9 @@ eclipse-bin/
 .settings/
 *.iml
 
+# VScode
+.vscode/
+.project
+
 # Mac
 .DS_Store
