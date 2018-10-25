@@ -72,6 +72,16 @@ public class MovingWindowAggregatorTest {
         final Iterator<Map.Entry<Long, Long>> entryIter = dpCountMap.entrySet().iterator();
         Assert.assertThat(entryIter.hasNext(), Matchers.is(true));
         Map.Entry<Long, Long> nextEntry = entryIter.next();
+        Assert.assertThat(new DateTime(nextEntry.getKey(), utc), Matchers.is(new DateTime(2014, 2, 1, 0, 0, utc)));
+        Assert.assertThat(nextEntry.getValue(), Matchers.is(31L)); // 31
+
+        Assert.assertThat(entryIter.hasNext(), Matchers.is(true));
+        nextEntry = entryIter.next();
+        Assert.assertThat(new DateTime(nextEntry.getKey(), utc), Matchers.is(new DateTime(2014, 3, 1, 0, 0, utc)));
+        Assert.assertThat(nextEntry.getValue(), Matchers.is(59L)); // 31 + 28
+
+        Assert.assertThat(entryIter.hasNext(), Matchers.is(true));
+        nextEntry = entryIter.next();
         Assert.assertThat(new DateTime(nextEntry.getKey(), utc), Matchers.is(new DateTime(2014, 4, 1, 0, 0, utc)));
         Assert.assertThat(nextEntry.getValue(), Matchers.is(90L)); // 31 + 28 + 31
 
@@ -125,11 +135,11 @@ public class MovingWindowAggregatorTest {
         }
 
         final Iterator<Map.Entry<Long, Long>> entryIter = dpCountMap.entrySet().iterator();
-        for (int i = 8; i <= 30; i++) {
+        for (int i = 2; i <= 30; i++) {
             Assert.assertThat(entryIter.hasNext(), Matchers.is(true));
             final Map.Entry<Long, Long> nextEntry = entryIter.next();
             Assert.assertThat(new DateTime(nextEntry.getKey(), utc), Matchers.is(new DateTime(2018, 1, i, 0, 0, utc)));
-            Assert.assertThat(nextEntry.getValue(), Matchers.is(7L));
+            Assert.assertThat(nextEntry.getValue(), Matchers.is(i < 8 ? i - 1 : 7L));
         }
     }
 
@@ -165,11 +175,11 @@ public class MovingWindowAggregatorTest {
         }
 
         final Iterator<Map.Entry<Long, Long>> entryIter = dpCountMap.entrySet().iterator();
-        for (int i = 8; i <= 29; i++) {
+        for (int i = 1; i <= 29; i++) {
             Assert.assertThat(entryIter.hasNext(), Matchers.is(true));
             final Map.Entry<Long, Long> nextEntry = entryIter.next();
             Assert.assertThat(new DateTime(nextEntry.getKey(), utc), Matchers.is(new DateTime(2018, 1, i, 1, 1, utc)));
-            Assert.assertThat(nextEntry.getValue(), Matchers.is(7L));
+            Assert.assertThat(nextEntry.getValue(), Matchers.is(i < 7 ? i : 7L));
         }
     }
 }

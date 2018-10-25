@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Factory that creates {@link HistogramDataPoint}.
+ * Factory that creates {@link HistogramDataPointImpl}.
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
@@ -72,7 +72,7 @@ public class HistogramDataPointFactory implements DataPointFactory{
             binValues.put(Double.parseDouble(entry.getKey()), entry.getValue().getAsInt());
         }
 
-        return new HistogramDataPoint(timestamp, 7, binValues, min, max, mean, sum);
+        return new HistogramDataPointImpl(timestamp, 7, binValues, min, max, mean, sum);
     }
 
     @Override
@@ -88,6 +88,6 @@ public class HistogramDataPointFactory implements DataPointFactory{
         final double mean = buffer.readDouble();
         final double sum = buffer.readDouble();
 
-        return new HistogramDataPoint(timestamp, 7, bins, min, max, mean, sum);
+        return new HistogramDataPointImpl(timestamp, 7, bins, min, max, mean, sum);
     }
 }

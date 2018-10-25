@@ -17,6 +17,7 @@ package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.HistogramDataPoint;
 import com.arpnetworking.kairosdb.HistogramDataPointFactory;
+import com.arpnetworking.kairosdb.HistogramDataPointImpl;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
@@ -87,7 +88,7 @@ public final class HistogramMergeAggregator extends RangeAggregator {
 
             final double mean = sum / count;
 
-            return Collections.singletonList(new HistogramDataPoint(returnTime, 7, merged, min, max, mean, sum));
+            return Collections.singletonList(new HistogramDataPointImpl(returnTime, 7, merged, min, max, mean, sum));
         }
     }
 }
