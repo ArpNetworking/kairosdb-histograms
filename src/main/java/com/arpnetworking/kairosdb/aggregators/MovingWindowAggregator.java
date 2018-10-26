@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 /**
@@ -425,7 +426,7 @@ public class MovingWindowAggregator extends RangeAggregator {
         }
 
         @Override
-        public TreeMap<Double, Integer> getMap() {
+        public NavigableMap<Double, Integer> getMap() {
             return _wrappedDataPoint.getMap();
         }
     }

@@ -17,12 +17,12 @@ package com.arpnetworking.kairosdb;
 
 import org.kairosdb.core.DataPoint;
 
-import java.util.TreeMap;
+import java.util.NavigableMap;
 
 /**
  * DataPoint that represents a Histogram.
  *
- * @author Brandon Arp (brandon dot arp at smartsheet dot com)
+ * @author Gil Markham (gmarkham at dropbox dot com)
  */
 public interface HistogramDataPoint extends DataPoint {
     /**
@@ -53,5 +53,5 @@ public interface HistogramDataPoint extends DataPoint {
      * Getter for the map of lower bucket value to sample count contained in this HistogramDataPoint.
      * @return map of histogram buckets
      */
-    TreeMap<Double, Integer> getMap();
+    NavigableMap<Double, Integer> getMap();
 }

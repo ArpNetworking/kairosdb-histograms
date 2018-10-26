@@ -27,7 +27,7 @@ import org.kairosdb.core.exception.KairosDBException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.NavigableMap;
 
 /**
  * Aggregator that computes the standard deviation value of histograms.
@@ -77,7 +77,7 @@ public class HistogramStdDevAggregator extends RangeAggregator {
                 final DataPoint dp = dataPointRange.next();
                 if (dp instanceof HistogramDataPoint) {
                     final HistogramDataPoint hist = (HistogramDataPoint) dp;
-                    final TreeMap<Double, Integer> map = hist.getMap();
+                    final NavigableMap<Double, Integer> map = hist.getMap();
                     if (map != null) {
                         for (Map.Entry<Double, Integer> entry : map.entrySet()) {
                             final int n = entry.getValue();

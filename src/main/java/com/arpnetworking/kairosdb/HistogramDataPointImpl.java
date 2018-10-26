@@ -49,8 +49,14 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
      * @param mean the mean value in the histogram
      * @param sum the sum of all the values in the histogram
      */
-    public HistogramDataPointImpl(final long timestamp, final int precision, final TreeMap<Double, Integer> map, final double min,
-                                  final double max, final double mean, final double sum) {
+    public HistogramDataPointImpl(
+            final long timestamp,
+            final int precision,
+            final TreeMap<Double, Integer> map,
+            final double min,
+            final double max,
+            final double mean,
+            final double sum) {
         super(timestamp);
         _precision = precision;
         _map = map;
