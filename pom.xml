@@ -94,7 +94,7 @@
     <joda.version>2.3</joda.version>
 
     <!-- Additional Plugins -->
-    <docker.maven.plugin.version>0.16.7</docker.maven.plugin.version>
+    <docker.maven.plugin.version>0.27.2</docker.maven.plugin.version>
     <maven.assembly.plugin.version>2.6</maven.assembly.plugin.version>
     <rpm.maven.plugin.version>2.1.5</rpm.maven.plugin.version>
 
