@@ -1,5 +1,5 @@
 /**
- * Copyright 2017 SmartSheet.com
+ * Copyright 2018 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,135 +15,43 @@
  */
 package com.arpnetworking.kairosdb;
 
-import org.json.JSONException;
-import org.json.JSONWriter;
-import org.kairosdb.core.datapoints.DataPointHelper;
+import org.kairosdb.core.DataPoint;
 
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.NavigableMap;
 
 /**
  * DataPoint that represents a Histogram.
  *
- * @author Brandon Arp (brandon dot arp at smartsheet dot com)
+ * @author Gil Markham (gmarkham at dropbox dot com)
  */
-public class HistogramDataPoint extends DataPointHelper {
-    private static final String API_TYPE = "histogram";
-    private final int _precision;
-    private final TreeMap<Double, Integer> _map;
-    private final double _min;
-    private final double _max;
-    private final double _mean;
-    private final double _sum;
+public interface HistogramDataPoint extends DataPoint {
+    /**
+     * Getter for sample count contained in this HistogramDataPoint.
+     * @return datapoint sample count
+     */
+    int getSampleCount();
 
     /**
-     * Public constructor.
-     *
-     * @param timestamp the timestamp.
-     * @param precision bucket precision, in bits
-     * @param map the bins with values
-     * @param min the minimum value in the histogram
-     * @param max the maximum value in the histogram
-     * @param mean the mean value in the histogram
-     * @param sum the sum of all the values in the histogram
+     * Getter for the sum of all samples contained in this HistogramDataPoint.
+     * @return sum of histogram samples
      */
-    public HistogramDataPoint(final long timestamp, final int precision, final TreeMap<Double, Integer> map, final double min,
-                              final double max, final double mean, final double sum) {
-        super(timestamp);
-        _precision = precision;
-        _map = map;
-        _min = min;
-        _max = max;
-        _mean = mean;
-        _sum = sum;
-    }
-
-    @Override
-    public void writeValueToBuffer(final DataOutput buffer) throws IOException {
-        buffer.writeInt(_map.size());
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
-            buffer.writeDouble(entry.getKey());
-            buffer.writeInt(entry.getValue());
-        }
-        buffer.writeDouble(_min);
-        buffer.writeDouble(_max);
-        buffer.writeDouble(_mean);
-        buffer.writeDouble(_sum);
-    }
-
-    @Override
-    public void writeValueToJson(final JSONWriter writer) throws JSONException {
-        writer.object().key("bins");
-        writer.object();
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
-            writer.key(entry.getKey().toString()).value(entry.getValue());
-        }
-        writer.endObject();
-        writer.key("min").value(_min);
-        writer.key("max").value(_max);
-        writer.key("mean").value(_mean);
-        writer.key("sum").value(_sum);
-        writer.endObject();
-    }
-
-    @Override
-    public String getApiDataType() {
-        return API_TYPE;
-    }
-
-    @Override
-    public String getDataStoreDataType() {
-        return HistogramDataPointFactory.DST;
-    }
-
-    @Override
-    public boolean isLong() {
-        return false;
-    }
-
-    @Override
-    public long getLongValue() {
-        return 0;
-    }
-
-    @Override
-    public boolean isDouble() {
-        return false;
-    }
-
-    @Override
-    public double getDoubleValue() {
-        return 0;
-    }
+    double getSum();
 
     /**
-     * Gets the number of samples in the bins.
-     *
-     * @return the number of samples
+     * Getter for the min value of the samples contained in this HistogramDataPoint.
+     * @return min of histogram samples
      */
-    public int getSampleCount() {
-        int count = 0;
-        for (Integer binSamples : _map.values()) {
-            count += binSamples;
-        }
-        return count;
-    }
+    double getMin();
 
-    public double getSum() {
-        return _sum;
-    }
+    /**
+     * Getter for the max value of the samples contained in this HistogramDataPoint.
+     * @return max of histogram samples
+     */
+    double getMax();
 
-    public double getMin() {
-        return _min;
-    }
-
-    public double getMax() {
-        return _max;
-    }
-
-    public TreeMap<Double, Integer> getMap() {
-        return _map;
-    }
+    /**
+     * Getter for the map of lower bucket value to sample count contained in this HistogramDataPoint.
+     * @return map of histogram buckets
+     */
+    NavigableMap<Double, Integer> getMap();
 }
