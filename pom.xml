@@ -18,7 +18,7 @@
   <parent>
     <groupId>com.arpnetworking.build</groupId>
     <artifactId>arpnetworking-parent-pom</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.11</version>
     <relativePath />
   </parent>
 
@@ -115,6 +115,9 @@
 
     <!-- Findbugs custom exclude, excludes protobuf generated code -->
     <findbugs.exclude>${project.basedir}/findbugs.exclude.xml</findbugs.exclude>
+
+    <!-- Additional Checkstyle Suppression -->
+    <checkstyleExtraSuppressions>${project.basedir}/checkstyle-extra-suppressions.xml</checkstyleExtraSuppressions>
   </properties>
   <build>
     <resources>
