@@ -1,5 +1,5 @@
-/**
- * Copyright 2017 SmartSheet.com
+/*
+ * Copyright 2019 Inscope Metrics, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,6 @@ public class HistogramDataPointV2Factory implements DataPointFactory {
 
     @Override
     public DataPoint getDataPoint(final long timestamp, final DataInput buffer) throws IOException {
-//        LOGGER.warn("reading HDPF from byte buffer");
         final int length = buffer.readInt();
         final byte[] data = new byte[length];
         buffer.readFully(data, 0, data.length);
@@ -110,12 +109,6 @@ public class HistogramDataPointV2Factory implements DataPointFactory {
         final double sum = protoData.getSum();
 
         final HistogramDataPointV2Impl histogramDataPointV2 = new HistogramDataPointV2Impl(timestamp, precision, bins, min, max, mean, sum);
-//        LOGGER.warn("created HDPF: " + histogramDataPointV2.toString());
         return histogramDataPointV2;
     }
-
-//    private Double expandPacked(final int packed) {
-//        return HistogramDataPointV2Impl.u
-//        return Double.longBitsToDouble(((long) packed) << 32);
-//    }
 }
