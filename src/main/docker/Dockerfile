@@ -4,7 +4,7 @@ RUN apk --update add bash; apk --update add curl
 
 # Install KAIROSDB
 RUN mkdir /opt; cd /opt; \
-  curl -L https://github.com/kairosdb/kairosdb/releases/download/v1.2.0/kairosdb-1.2.0-1.tar.gz | \
+  curl -L https://github.com/kairosdb/kairosdb/releases/download/v1.2.2/kairosdb-1.2.2-1.tar.gz | \
   tar zxfp -
 
 EXPOSE 8080
