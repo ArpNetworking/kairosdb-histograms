@@ -411,7 +411,7 @@ public class MovingWindowAggregator extends RangeAggregator {
         }
 
         @Override
-        public int getSampleCount() {
+        public long getSampleCount() {
             return _wrappedDataPoint.getSampleCount();
         }
 

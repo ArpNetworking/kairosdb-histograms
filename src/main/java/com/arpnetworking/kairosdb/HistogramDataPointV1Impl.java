@@ -105,7 +105,7 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
     @Override
     public void writeValueToBuffer(final DataOutput buffer) throws IOException {
         buffer.writeInt(_map.size());
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
+        for (final Map.Entry<Double, Integer> entry : _map.entrySet()) {
             buffer.writeDouble(entry.getKey());
             buffer.writeInt(entry.getValue());
         }
@@ -119,7 +119,7 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
     public void writeValueToJson(final JSONWriter writer) throws JSONException {
         writer.object().key("bins");
         writer.object();
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
+        for (final Map.Entry<Double, Integer> entry : _map.entrySet()) {
             writer.key(entry.getKey().toString()).value(entry.getValue());
         }
         writer.endObject();
@@ -177,9 +177,9 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
      * @return the number of samples
      */
     @Override
-    public int getSampleCount() {
-        int count = 0;
-        for (Integer binSamples : _map.values()) {
+    public long getSampleCount() {
+        long count = 0;
+        for (final Integer binSamples : _map.values()) {
             count += binSamples;
         }
         return count;

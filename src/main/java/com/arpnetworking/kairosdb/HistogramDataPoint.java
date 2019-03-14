@@ -35,7 +35,7 @@ public interface HistogramDataPoint extends DataPoint {
      * Getter for sample count contained in this HistogramDataPoint.
      * @return datapoint sample count
      */
-    int getSampleCount();
+    long getSampleCount();
 
     /**
      * Getter for the sum of all samples contained in this HistogramDataPoint.

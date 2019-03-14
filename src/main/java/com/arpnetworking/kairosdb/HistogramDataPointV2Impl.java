@@ -17,6 +17,8 @@ package com.arpnetworking.kairosdb;
 
 import com.arpnetworking.kairosdb.proto.v2.DataPointV2;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.json.JSONException;
 import org.json.JSONWriter;
 import org.kairosdb.core.datapoints.DataPointHelper;
@@ -41,6 +43,7 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
     private final double _sum;
     private final long _mask;
     private final int _finalMask;
+    private final Supplier<Long> _countSupplier;
 
     /**
      * Public constructor.
@@ -70,18 +73,19 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
         _sum = sum;
         _mask = 0xfff0000000000000L >> _precision;
         _finalMask = (1 << (_precision + 12)) - 1;
+        _countSupplier = Suppliers.memoize(this::computeSampleCount);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("_precision", _precision)
-                .add("_map", _map)
-                .add("_min", _min)
-                .add("_max", _max)
-                .add("_mean", _mean)
-                .add("_sum", _sum)
-                .add("m_timestamp", m_timestamp)
+                .add("precision", _precision)
+                .add("map", _map)
+                .add("min", _min)
+                .add("max", _max)
+                .add("mean", _mean)
+                .add("sum", _sum)
+                .add("timestamp", m_timestamp)
                 .toString();
     }
 
@@ -89,7 +93,7 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
     public void writeValueToBuffer(final DataOutput buffer) throws IOException {
         final DataPointV2.DataPoint.Builder builder = DataPointV2.DataPoint.newBuilder();
 
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
+        for (final Map.Entry<Double, Integer> entry : _map.entrySet()) {
             builder.putHistogram(pack(entry.getKey()), entry.getValue());
         }
 
@@ -109,7 +113,7 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
     public void writeValueToJson(final JSONWriter writer) throws JSONException {
         writer.object().key("bins");
         writer.object();
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
+        for (final Map.Entry<Double, Integer> entry : _map.entrySet()) {
             writer.key(entry.getKey().toString()).value(entry.getValue());
         }
         writer.endObject();
@@ -152,9 +156,13 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
     }
 
     @Override
-    public int getSampleCount() {
-        int count = 0;
-        for (Integer binSamples : _map.values()) {
+    public long getSampleCount() {
+        return _countSupplier.get();
+    }
+
+    private long computeSampleCount() {
+        long count = 0;
+        for (final Integer binSamples : _map.values()) {
             count += binSamples;
         }
         return count;
@@ -189,11 +197,9 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
         final long truncated = Double.doubleToRawLongBits(unpacked) & _mask;
         final long shifted = truncated >> (52 - _precision);
         return shifted & _finalMask;
-//        return Double.doubleToLongBits(unpacked);
     }
 
     static double unpack(final long packed, final int precision) {
         return Double.longBitsToDouble(packed << (52 - precision));
-//        return Double.longBitsToDouble(packed);
     }
 }
