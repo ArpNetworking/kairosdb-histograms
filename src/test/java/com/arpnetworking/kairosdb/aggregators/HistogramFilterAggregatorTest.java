@@ -31,9 +31,9 @@ public class HistogramFilterAggregatorTest {
 
         Assert.assertEquals("Histograms did not match", hist1.getMap(), hist2.getMap());
         Assert.assertEquals(hist1.getSampleCount(), hist2.getSampleCount());
-        Assert.assertTrue(hist1.getSum() == hist2.getSum());
-        Assert.assertTrue(hist1.getMin() == hist2.getMin());
-        Assert.assertTrue(hist1.getMax() == hist2.getMax());
+        Assert.assertEquals(hist1.getSum(), hist2.getSum(), 0);
+        Assert.assertEquals(hist1.getMin(), hist2.getMin(), 0);
+        Assert.assertEquals(hist1.getMax(), hist2.getMax(), 0);
     }
 
     private HistogramDataPoint createHistogram(long timeStamp, final TreeMap<Double, Integer> bins) {

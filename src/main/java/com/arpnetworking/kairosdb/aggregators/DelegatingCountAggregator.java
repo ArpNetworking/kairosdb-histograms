@@ -15,7 +15,7 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
 import com.google.inject.Inject;
 import org.kairosdb.core.annotation.FeatureComponent;
 
@@ -29,14 +29,14 @@ import javax.inject.Named;
 @FeatureComponent(
         name = "count",
         description = "Counts the number of data points.")
-public final class DelegatingCountAggregator extends DelegatingAggregator {
+public final class DelegatingCountAggregator extends DelegatingRangeAggregator {
     /**
      * Public constructor.
      *
      * @param aggregatorMap aggregators to use
      */
     @Inject
-    public DelegatingCountAggregator(@Named("count") final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingCountAggregator(@Named("count") final DelegatingRangeAggregatorMap aggregatorMap) {
         super(aggregatorMap);
     }
 }

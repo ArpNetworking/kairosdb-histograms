@@ -24,7 +24,7 @@ import java.util.*;
         description = "Filters histograms according to filter operation")
 public class HistogramFilterAggregator implements Aggregator {
 
-    public static final int PRECISION = 7;
+    private static final int PRECISION = 7;
 
     public enum FilterOperation {
         LTE, LT, GTE, GT, EQUAL

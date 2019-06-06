@@ -15,7 +15,7 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
 import com.google.inject.Inject;
 import org.kairosdb.core.annotation.FeatureComponent;
 
@@ -29,14 +29,14 @@ import javax.inject.Named;
 @FeatureComponent(
         name = "sum",
         description = "Adds data points together.")
-public final class DelegatingSumAggregator extends DelegatingAggregator {
+public final class DelegatingSumAggregator extends DelegatingRangeAggregator {
     /**
      * Public constructor.
      *
      * @param aggregatorMap aggregators to use
      */
     @Inject
-    public DelegatingSumAggregator(@Named("sum") final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingSumAggregator(@Named("sum") final DelegatingRangeAggregatorMap aggregatorMap) {
         super(aggregatorMap);
     }
 }
