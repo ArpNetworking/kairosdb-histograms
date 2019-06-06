@@ -160,14 +160,16 @@ public class HistogramFilterAggregatorTest {
 
     @Test
     public void testFilter_LessThan_Keep_ThresholdAtBinBoundary_PositiveBins() {
-        ListDataPointGroup expected = new ListDataPointGroup("test_expected");
+        ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17);
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53);
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7);
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5);
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
         runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
@@ -176,13 +178,16 @@ public class HistogramFilterAggregatorTest {
 
     @Test
     public void testFilter_LessThan_Keep_ThresholdAtBinBoundary_NegativeBins() {
-        ListDataPointGroup expected = new ListDataPointGroup("test_lt_values_expected");
+        ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
         runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
@@ -193,10 +198,12 @@ public class HistogramFilterAggregatorTest {
     public void testFilter_LessThan_Keep_ThresholdMiddleOfBin_PositiveBins() {
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
@@ -211,9 +218,12 @@ public class HistogramFilterAggregatorTest {
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
         runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
@@ -222,539 +232,510 @@ public class HistogramFilterAggregatorTest {
 
     @Test
     public void testFilter_LessThan_Discard_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_LessThan_Discard_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_LessThan_Discard_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_LessThan_Discard_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Keep_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Keep_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Keep_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Keep_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Discard_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Discard_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Discard_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_LessThanOrEqual_Discard_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Keep_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Keep_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Keep_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Keep_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Discard_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Discard_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Discard_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThan_Discard_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Keep_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Keep_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Keep_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Keep_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Discard_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Discard_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Discard_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x0000000000000000L)), 3); //  0.0
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059000000000000L)), 7); //1.e79
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_GreaterThanOrEqual_Discard_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
-        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
+//        expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x8000000000000000L)), 3); //  -0.0
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059000000000000L)), 7); //-1.e79
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_Equal_Keep_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
@@ -767,13 +748,12 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_Equal_Keep_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
@@ -786,13 +766,12 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_Equal_Keep_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
@@ -805,13 +784,12 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_Equal_Keep_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
@@ -824,17 +802,16 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, false, expected);
     }
 
     @Test
     public void testFilter_Equal_Discard_ThresholdAtBinBoundary_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
@@ -843,17 +820,16 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, true, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, true, expected);
     }
 
     @Test
     public void testFilter_Equal_Discard_ThresholdAtBinBoundary_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
@@ -862,17 +838,16 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
-                false, false, expected);
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                true, false, expected);
     }
 
     @Test
     public void testFilter_Equal_Discard_ThresholdMiddleOfBin_PositiveBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4058e00000000000L)), 13); // 99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059000000000000L)), 17); //100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x4059200000000000L)), 53); //100.6
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
@@ -881,17 +856,16 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0x5059200000000000L)), 5); //1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true, expected);
     }
 
     @Test
     public void testFilter_Equal_Discard_ThresholdMiddleOfBin_NegativeBins() {
-        //TODO
         ListDataPointGroup expected = new ListDataPointGroup("test_values_expected");
         final TreeMap<Double, Integer> expectedBins1 = new TreeMap<>();
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc058e00000000000L)), 13); // -99.5
-        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
+//        expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059000000000000L)), 17); //-100.0
         expectedBins1.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xc059200000000000L)), 53); //-100.5
         expected.addDataPoint(createHistogram(1L, expectedBins1));
         final TreeMap<Double, Integer> expectedBins2 = new TreeMap<>();
@@ -900,7 +874,7 @@ public class HistogramFilterAggregatorTest {
         expectedBins2.put(HistogramFilterAggregator.truncate(Double.longBitsToDouble(0xd059200000000000L)), 5); //-1.e79
         expected.addDataPoint(createHistogram(2L, expectedBins2));
 
-        runTest(HistogramFilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
+        runTest(HistogramFilterAggregator.FilterOperation.EQUAL, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false, expected);
     }
 

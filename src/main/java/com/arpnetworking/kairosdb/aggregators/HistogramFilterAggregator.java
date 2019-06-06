@@ -108,12 +108,7 @@ public class HistogramFilterAggregator implements Aggregator {
         bound >>= 45;
         bound += 1;
         bound <<= 45;
-        if (bound > 0) {
-            bound -= 1;
-        } else {
-            bound += 1;
-        }
-//        System.out.printf("%x -> %f\n", bound, Double.longBitsToDouble(bound));
+        bound -= 1;
         return Double.longBitsToDouble(bound);
     }
 
