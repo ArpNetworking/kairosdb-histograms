@@ -33,11 +33,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
+import java.util.Arrays;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -244,14 +244,47 @@ public class AggregationIT {
         Assert.assertEquals(0, queryObject.getInt("sample_size"));
     }
 
+    // **** filter aggregator ***
+    @Test
+    public void testFilterAggregatorSingle() throws IOException, JSONException {
+        //TODO
+        final List<Histogram> expected = Lists.newArrayList(
+                new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d)));
+        testAggregate("filter", SINGLE_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+    }
+
+    @Test
+    public void testFilterAggregatorMulti() throws IOException, JSONException {
+        //TODO
+        final List<Histogram> expected = Lists.newArrayList(
+                new Histogram(Arrays.asList(9d, 1d, 9d, 1d, 8d, 12d)),
+                new Histogram(Arrays.asList(18d, 2d, 18d, 2d, 20d, 20d)));
+        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+    }
+
+    @Test
+    public void testDefaultFilterAggregator() throws IOException, JSONException {
+        //TODO
+//        testDoubleAggregate("dev", DOUBLE_TEST_DATA, Math.sqrt(13d));
+    }
+
     private Map<String, Double> percentileParam(final double percentile) {
-        final HashMap<String, Double> map = Maps.newHashMap();
+        final Map<String, Double> map = Maps.newHashMap();
         map.put("percentile", percentile);
         return map;
     }
 
+    //TODO
+    private Map<String, Object> filterParam(final String op, final String inclusion, final double threshold) {
+        final Map<String, Object> params = Maps.newHashMap();
+        params.put("filter_op", op);
+//        params.put("filter_indeterminate_inclusion", inclusion);
+//        params.put("threshold", threshold);
+        return params;
+    }
+
     private Map<String, Double> apdexParam(final double target) {
-        final HashMap<String, Double> map = Maps.newHashMap();
+        final Map<String, Double> map = Maps.newHashMap();
         map.put("target", target);
         return map;
     }
@@ -322,6 +355,24 @@ public class AggregationIT {
         verifyQueryResponse(histograms.size(), expected, body);
     }
 
+    //TODO
+    private void testAggregate(
+            final String aggregator,
+            final List<Histogram> histograms,
+            final List<Histogram> expected,
+            final Map<String, ?> aggParams)
+            throws JSONException, IOException {
+        final String metricName = aggregator + "_agg_test_" + TEST_NUMBER.getAndIncrement();
+
+        int i = 1;
+        for (final Histogram histogram : histograms) {
+            postHistogramWithExpectedCode(metricName, i++, histogram, 204);
+        }
+
+        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), aggregator, aggParams, 200);
+        verifyQueryResponse(histograms.size(), expected, body);
+    }
+
     private void verifyQueryResponse(
             final int expectedSamples,
             final double expectedResult,
@@ -349,6 +400,27 @@ public class AggregationIT {
         final JSONObject histObject = result.getJSONObject(1);
         final Histogram returnHistogram = new Histogram(histObject);
         Assert.assertEquals(expectedResult, returnHistogram);
+    }
+
+    //TODO
+    private void verifyQueryResponse(
+            final int expectedSamples,
+            final List<Histogram> expectedResult,
+            final String responseBody)
+            throws JSONException {
+        final JSONObject responseJson = new JSONObject(responseBody);
+        final JSONObject queryObject = responseJson.getJSONArray("queries").getJSONObject(0);
+        Assert.assertEquals(expectedSamples, queryObject.getInt("sample_size"));
+        final JSONArray result = queryObject.getJSONArray("results")
+                .getJSONObject(0).getJSONArray("values");
+
+        for (int i = 0; i < result.length(); i++) {
+            final JSONArray jsonPair =  result.getJSONArray(i);
+            Assert.assertEquals(i + 1, jsonPair.getInt(0));
+            Histogram returnHistogram = new Histogram(jsonPair.getJSONObject(1));
+
+            Assert.assertEquals(expectedResult.get(i), returnHistogram);
+        }
     }
 
     private void postDoubleWithExpectedCode(

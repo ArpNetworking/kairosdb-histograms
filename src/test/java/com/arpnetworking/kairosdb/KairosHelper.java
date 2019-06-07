@@ -126,7 +126,7 @@ public final class KairosHelper {
         sampling.put("unit", "minutes");
         final JSONObject aggregatorJson = new JSONObject();
         aggregatorJson.put("name", aggregator);
-        aggregatorJson.put("sampling", sampling);
+//        aggregatorJson.put("sampling", sampling); //TODO
 
         if (aggregatorParameters != null) {
             final JSONArray names = aggregatorParameters.names();

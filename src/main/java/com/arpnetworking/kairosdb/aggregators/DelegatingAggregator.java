@@ -16,8 +16,6 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
-import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
-import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTimeZone;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
@@ -38,9 +36,6 @@ import javax.inject.Provider;
 public class DelegatingAggregator implements Aggregator {
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingRangeAggregator.class);
     private final DelegatingAggregatorMap _aggregatorMap;
-    private boolean _sampleAlign;
-    private long _startTime;
-    private DateTimeZone _timeZone = DateTimeZone.UTC;
 
     /**
      * Public constructor.
@@ -69,9 +64,17 @@ public class DelegatingAggregator implements Aggregator {
         }
 
         final Aggregator aggregator = aggregatorOptional.get();
+        setProperties(aggregator);
 
         return aggregator.aggregate(wrapped);
     }
+
+    /**
+     * Provides a way to set additional properties on the delegated aggregator.
+     *
+     * @param aggregator the delegated aggregator
+     */
+    protected void setProperties(final Aggregator aggregator) { }
 
     @Override
     public boolean canAggregate(final String groupType) {

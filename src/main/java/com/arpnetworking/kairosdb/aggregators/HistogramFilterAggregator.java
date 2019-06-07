@@ -7,15 +7,17 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.AggregatedDataPointGroupWrapper;
+import org.kairosdb.core.aggregator.FilterAggregator;
 import org.kairosdb.core.annotation.FeatureComponent;
 import org.kairosdb.core.annotation.FeatureProperty;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.plugin.Aggregator;
 
-import java.util.*;
+import java.util.TreeMap;
+import java.util.Map;
 
 /**
- * Aggregator that filters away some bins of a histogram based on an operation and threshold
+ * Aggregator that filters away some bins of a histogram based on an operation and threshold.
  *
  * @author Joey Jackson
  */
@@ -25,10 +27,6 @@ import java.util.*;
 public class HistogramFilterAggregator implements Aggregator {
 
     private static final int PRECISION = 7;
-
-    public enum FilterOperation {
-        LTE, LT, GTE, GT, EQUAL
-    }
 
     public enum FilterIndeterminate {
         KEEP, DISCARD
@@ -40,19 +38,19 @@ public class HistogramFilterAggregator implements Aggregator {
             description = "The operation performed for each data point.",
             type = "enum",
             options = {"lte", "lt", "gte", "gt", "equal"},
-            default_value = "gt"
+            default_value = "lt"
     )
-    private FilterOperation _filterop;
+    private FilterAggregator.FilterOperation _filterop;
 
     @FeatureProperty(
-            name = "filter_indeterminate",
-            label = "Filter Indeterminate",
+            name = "filter_indeterminate_inclusion",
+            label = "Filter indeterminate inclusion",
             description = "Whether to keep or discard a histogram bin that straddles the threshold when filtering",
             type = "enum",
             options = {"keep", "discard"},
             default_value = "keep"
     )
-    private FilterIndeterminate _filterind;
+    private FilterIndeterminate _filterinc;
 
     @FeatureProperty(
             label = "Threshold",
@@ -67,11 +65,11 @@ public class HistogramFilterAggregator implements Aggregator {
     @Inject
     public HistogramFilterAggregator() {
         _threshold = 0.0;
-        _filterop = FilterOperation.GT;
-        _filterind = FilterIndeterminate.KEEP;
+        _filterop = FilterAggregator.FilterOperation.LT;
+        _filterinc = FilterIndeterminate.KEEP;
     }
 
-    public void setFilterOp(FilterOperation filterop) {
+    public void setFilterOp(FilterAggregator.FilterOperation filterop) {
         _filterop = filterop;
     }
 
@@ -79,8 +77,8 @@ public class HistogramFilterAggregator implements Aggregator {
         _threshold = threshold;
     }
 
-    public void setInclusion(FilterIndeterminate inclusion) {
-        _filterind = inclusion;
+    public void setFilterIndeterminateInclusion(FilterIndeterminate inclusion) {
+        _filterinc = inclusion;
     }
 
     @Override
@@ -109,11 +107,12 @@ public class HistogramFilterAggregator implements Aggregator {
         bound += 1;
         bound <<= 45;
         bound -= 1;
+
         return Double.longBitsToDouble(bound);
     }
 
     private static boolean isNegative(double value) {
-        return Double.doubleToLongBits(value) < 0;
+        return Double.doubleToLongBits(value) >> 63 < 0;
     }
 
     private class HistogramFilterDataPointAggregator extends AggregatedDataPointGroupWrapper {
@@ -175,34 +174,34 @@ public class HistogramFilterAggregator implements Aggregator {
                 upperBound = binBound(value);
             }
 
-            if (_filterop == FilterOperation.LTE) {
-                if (_filterind == FilterIndeterminate.DISCARD) {
+            if (_filterop == FilterAggregator.FilterOperation.LTE) {
+                if (_filterinc == FilterIndeterminate.DISCARD) {
                     return lowerBound <= _threshold;
-                } else if (_filterind == FilterIndeterminate.KEEP) {
+                } else if (_filterinc == FilterIndeterminate.KEEP) {
                     return upperBound <= _threshold;
                 }
-            } else if (_filterop == FilterOperation.LT){
-                if (_filterind == FilterIndeterminate.DISCARD) {
+            } else if (_filterop == FilterAggregator.FilterOperation.LT){
+                if (_filterinc == FilterIndeterminate.DISCARD) {
                     return lowerBound < _threshold;
-                } else if (_filterind == FilterIndeterminate.KEEP) {
+                } else if (_filterinc == FilterIndeterminate.KEEP) {
                     return upperBound < _threshold;
                 }
-            } else if (_filterop == FilterOperation.GTE) {
-                if (_filterind == FilterIndeterminate.DISCARD) {
+            } else if (_filterop == FilterAggregator.FilterOperation.GTE) {
+                if (_filterinc == FilterIndeterminate.DISCARD) {
                     return upperBound >= _threshold;
-                } else if (_filterind == FilterIndeterminate.KEEP) {
+                } else if (_filterinc == FilterIndeterminate.KEEP) {
                     return lowerBound >= _threshold;
                 }
-            } else if (_filterop == FilterOperation.GT) {
-                if (_filterind == FilterIndeterminate.DISCARD) {
+            } else if (_filterop == FilterAggregator.FilterOperation.GT) {
+                if (_filterinc == FilterIndeterminate.DISCARD) {
                     return upperBound > _threshold;
-                } else if (_filterind == FilterIndeterminate.KEEP) {
+                } else if (_filterinc == FilterIndeterminate.KEEP) {
                     return lowerBound > _threshold;
                 }
-            } else if (_filterop == FilterOperation.EQUAL) {
-                if (_filterind == FilterIndeterminate.DISCARD) {
+            } else if (_filterop == FilterAggregator.FilterOperation.EQUAL) {
+                if (_filterinc == FilterIndeterminate.DISCARD) {
                     return _threshold >= lowerBound && _threshold <= upperBound;
-                } else if (_filterind == FilterIndeterminate.KEEP) {
+                } else if (_filterinc == FilterIndeterminate.KEEP) {
                     return false;
                 }
 
