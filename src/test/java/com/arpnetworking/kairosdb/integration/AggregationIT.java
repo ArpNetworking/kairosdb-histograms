@@ -35,10 +35,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Map;
+
 import java.util.List;
 import java.util.Arrays;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.UUID;
 
 /**
  * Tests for storing histogram datapoints.
@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class AggregationIT {
-    private static final AtomicInteger TEST_NUMBER = new AtomicInteger(1);
     private static final List<Histogram> SINGLE_HIST_TEST_DATA = Lists.newArrayList(
             new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d)));
     private static final List<Double> DOUBLE_TEST_DATA = Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d);
@@ -310,7 +309,7 @@ public class AggregationIT {
             final double expected,
             final Map<String, ?> aggParams)
             throws JSONException, IOException {
-        final String metricName = aggregator + "_agg_test_" + TEST_NUMBER.getAndIncrement();
+        final String metricName = newMetricName(aggregator);
 
         int i = 1;
         for (final Double number : data) {
@@ -327,7 +326,7 @@ public class AggregationIT {
             final double expected,
             final Map<String, ?> aggParams)
         throws JSONException, IOException {
-        final String metricName = aggregator + "_agg_test_" + TEST_NUMBER.getAndIncrement();
+        final String metricName = newMetricName(aggregator);
 
         int i = 1;
         for (final Histogram histogram : histograms) {
@@ -344,7 +343,7 @@ public class AggregationIT {
             final Histogram expected,
             final Map<String, ?> aggParams)
             throws JSONException, IOException {
-        final String metricName = aggregator + "_agg_test_" + TEST_NUMBER.getAndIncrement();
+        final String metricName = newMetricName(aggregator);
 
         int i = 1;
         for (final Histogram histogram : histograms) {
@@ -362,7 +361,7 @@ public class AggregationIT {
             final List<Histogram> expected,
             final Map<String, ?> aggParams)
             throws JSONException, IOException {
-        final String metricName = aggregator + "_agg_test_" + TEST_NUMBER.getAndIncrement();
+        final String metricName = newMetricName(aggregator);
 
         int i = 1;
         for (final Histogram histogram : histograms) {
@@ -449,6 +448,10 @@ public class AggregationIT {
         try (CloseableHttpResponse response = _client.execute(post)) {
             Assert.assertEquals(expectedCode, response.getStatusLine().getStatusCode());
         }
+    }
+
+    private static String newMetricName(final String prefix) {
+        return prefix + "_test_" + UUID.randomUUID();
     }
 
     private String queryWithExpectedCode(
