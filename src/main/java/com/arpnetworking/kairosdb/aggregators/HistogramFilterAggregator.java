@@ -1,3 +1,18 @@
+/**
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.HistogramDataPoint;
@@ -13,8 +28,8 @@ import org.kairosdb.core.annotation.FeatureProperty;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.plugin.Aggregator;
 
-import java.util.TreeMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Aggregator that filters away some bins of a histogram based on an operation and threshold.
@@ -28,8 +43,20 @@ public class HistogramFilterAggregator implements Aggregator {
 
     private static final int PRECISION = 7;
 
+    /**
+     * Whether to keep or discard indeterminate buckets when filtering.
+     */
     public enum FilterIndeterminate {
-        KEEP, DISCARD
+        /**
+         * Keep the individual buckets in the data point group if it is indeterminate if they should be filtered by the
+         * specific query.
+         */
+        KEEP,
+        /**
+         * Discard the individual buckets in the data point group if it is indeterminate if they should be filtered by
+         * the specific query.
+         */
+        DISCARD
     }
 
     @FeatureProperty(
@@ -54,13 +81,14 @@ public class HistogramFilterAggregator implements Aggregator {
 
     @FeatureProperty(
             label = "Threshold",
-            description = "The value the operation is performed on. If the operation is lt, then a null data point is returned if the data point is less than the threshold."
+            description = "The value the operation is performed on. If the operation is lt, then a null data point "
+                    + "is returned if the data point is less than the threshold."
     )
     private double _threshold;
 
 
     /**
-     * Public Constructor
+     * Public Constructor.
      */
     @Inject
     public HistogramFilterAggregator() {
@@ -69,20 +97,20 @@ public class HistogramFilterAggregator implements Aggregator {
         _filterinc = FilterIndeterminate.KEEP;
     }
 
-    public void setFilterOp(FilterAggregator.FilterOperation filterop) {
+    public void setFilterOp(final FilterAggregator.FilterOperation filterop) {
         _filterop = filterop;
     }
 
-    public void setThreshold(double threshold) {
+    public void setThreshold(final double threshold) {
         _threshold = threshold;
     }
 
-    public void setFilterIndeterminateInclusion(FilterIndeterminate inclusion) {
+    public void setFilterIndeterminateInclusion(final FilterIndeterminate inclusion) {
         _filterinc = inclusion;
     }
 
     @Override
-    public DataPointGroup aggregate(DataPointGroup dataPointGroup) {
+    public DataPointGroup aggregate(final DataPointGroup dataPointGroup) {
         return new HistogramFilterDataPointAggregator(dataPointGroup);
     }
 
@@ -111,12 +139,12 @@ public class HistogramFilterAggregator implements Aggregator {
         return Double.longBitsToDouble(bound);
     }
 
-    private static boolean isNegative(double value) {
+    private static boolean isNegative(final double value) {
         return Double.doubleToLongBits(value) >> 63 < 0;
     }
 
     private class HistogramFilterDataPointAggregator extends AggregatedDataPointGroupWrapper {
-        public HistogramFilterDataPointAggregator(DataPointGroup innerDataPointGroup) {
+        HistogramFilterDataPointAggregator(final DataPointGroup innerDataPointGroup) {
             super(innerDataPointGroup);
         }
 
@@ -125,7 +153,7 @@ public class HistogramFilterAggregator implements Aggregator {
         }
 
         public DataPoint next() {
-            DataPoint dp = currentDataPoint;
+            final DataPoint dp = currentDataPoint;
             final long timeStamp = dp.getTimestamp();
             final TreeMap<Double, Integer> filtered = Maps.newTreeMap();
             double min = Double.MAX_VALUE;
@@ -137,8 +165,8 @@ public class HistogramFilterAggregator implements Aggregator {
                 final HistogramDataPoint hist = (HistogramDataPoint) dp;
 
                 for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
-                    double binValue = entry.getKey();
-                    int binCount = entry.getValue();
+                    final double binValue = entry.getKey();
+                    final int binCount = entry.getValue();
                     if (!matchesCriteria(binValue)) {
                         filtered.put(binValue, binCount);
                         min = Math.min(min, binValue);
@@ -155,15 +183,16 @@ public class HistogramFilterAggregator implements Aggregator {
         }
 
         private void moveCurrentDataPoint() {
-            if (hasNextInternal())
+            if (hasNextInternal()) {
                 currentDataPoint = nextInternal();
-            else
+            } else {
                 currentDataPoint = null;
+            }
         }
 
-        private boolean matchesCriteria(double value) {
-            double lowerBound;
-            double upperBound;
+        private boolean matchesCriteria(final double value) {
+            final double lowerBound;
+            final double upperBound;
             if (isNegative(value)) {
                 //Negative
                 upperBound = truncate(value);
@@ -180,7 +209,7 @@ public class HistogramFilterAggregator implements Aggregator {
                 } else if (_filterinc == FilterIndeterminate.KEEP) {
                     return upperBound <= _threshold;
                 }
-            } else if (_filterop == FilterAggregator.FilterOperation.LT){
+            } else if (_filterop == FilterAggregator.FilterOperation.LT) {
                 if (_filterinc == FilterIndeterminate.DISCARD) {
                     return lowerBound < _threshold;
                 } else if (_filterinc == FilterIndeterminate.KEEP) {

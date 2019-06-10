@@ -1,3 +1,18 @@
+/**
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
@@ -7,9 +22,6 @@ import org.kairosdb.core.annotation.FeatureComponent;
 import org.kairosdb.plugin.Aggregator;
 
 import javax.inject.Named;
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Filter aggregator that delegates to the built-in and the histogram aggregators.
@@ -24,15 +36,32 @@ public class DelegatingFilterAggregator extends DelegatingAggregator {
     private HistogramFilterAggregator.FilterIndeterminate _filterinc;
     private double _threshold;
 
-    public void setFilterOp(FilterAggregator.FilterOperation filterop) {
+    /**
+     * Setter for filter operation.
+     *
+     * @param filterop the filter operation
+     */
+    public void setFilterOp(final FilterAggregator.FilterOperation filterop) {
         _filterop = filterop;
     }
 
-    public void setThreshold(double threshold) {
+    /**
+     * Setter for filter threshold.
+     *
+     * @param threshold the filter threshold
+     */
+    public void setThreshold(final double threshold) {
         _threshold = threshold;
     }
 
-    public void setFilterIndeterminateInclusion(HistogramFilterAggregator.FilterIndeterminate inclusion) { _filterinc = inclusion; }
+    /**
+     * Setter for filter inclusion.
+     *
+     * @param inclusion the filter inclusion
+     */
+    public void setFilterIndeterminateInclusion(final HistogramFilterAggregator.FilterIndeterminate inclusion) {
+        _filterinc = inclusion;
+    }
 
     /**
      * Public constructor.
@@ -59,13 +88,6 @@ public class DelegatingFilterAggregator extends DelegatingAggregator {
             filterAggregator.setFilterOp(_filterop);
             filterAggregator.setThreshold(_threshold);
 
-        } else {
-            try {
-                final PropertyDescriptor pd = new PropertyDescriptor("filter_op", aggregator.getClass());
-                pd.getWriteMethod().invoke(aggregator, _filterop);
-            } catch (final IntrospectionException | InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }
