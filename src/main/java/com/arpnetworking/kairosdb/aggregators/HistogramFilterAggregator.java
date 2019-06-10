@@ -1,5 +1,5 @@
 /**
- *
+ * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,9 +160,11 @@ public class HistogramFilterAggregator implements Aggregator {
             double max = -Double.MAX_VALUE;
             double sum = 0;
             long count = 0;
+            int originalCount = 0;
 
             if (dp instanceof HistogramDataPoint) {
                 final HistogramDataPoint hist = (HistogramDataPoint) dp;
+                originalCount = hist.getOriginalCount();
 
                 for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
                     final double binValue = entry.getKey();
@@ -179,7 +181,7 @@ public class HistogramFilterAggregator implements Aggregator {
 
             final double mean = sum / count;
             moveCurrentDataPoint();
-            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum);
+            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum, originalCount);
         }
 
         private void moveCurrentDataPoint() {

@@ -30,7 +30,7 @@ import java.util.TreeMap;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class HistogramDataPointFactory implements DataPointFactory{
+public class HistogramDataPointFactory implements DataPointFactory {
     /**
      * Name of the Data Store Type.
      */
