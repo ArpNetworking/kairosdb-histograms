@@ -16,9 +16,7 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
-import org.joda.time.DateTimeZone;
 import org.kairosdb.core.DataPoint;
-import org.kairosdb.core.aggregator.RangeAggregator;
 import org.kairosdb.core.datapoints.DoubleDataPointFactoryImpl;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.plugin.Aggregator;

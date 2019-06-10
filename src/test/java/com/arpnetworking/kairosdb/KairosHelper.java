@@ -121,12 +121,8 @@ public final class KairosHelper {
             final String aggregator,
             final JSONObject aggregatorParameters)
             throws JSONException {
-        final JSONObject sampling = new JSONObject();
-        sampling.put("value", 10);
-        sampling.put("unit", "minutes");
         final JSONObject aggregatorJson = new JSONObject();
         aggregatorJson.put("name", aggregator);
-//        aggregatorJson.put("sampling", sampling); //TODO
 
         if (aggregatorParameters != null) {
             final JSONArray names = aggregatorParameters.names();
