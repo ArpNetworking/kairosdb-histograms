@@ -260,25 +260,11 @@ public class AggregationIT {
 
     @Test
     public void testFilterAroundZero() throws IOException, JSONException {
-        final List<Histogram> input = Lists.newArrayList(new Histogram(Arrays.asList(
-                Double.longBitsToDouble(0x4059000000000000L),
-                Double.longBitsToDouble(0x0000000000000000L),
-                Double.longBitsToDouble(0x8000000000000000L),
-                Double.longBitsToDouble(0xc059000000000000L)
-        )));
-
-        final List<Histogram> expectedPositiveBins = Lists.newArrayList(new Histogram(Arrays.asList(
-                Double.longBitsToDouble(0x4059000000000000L),
-                Double.longBitsToDouble(0x0000000000000000L)
-        )));
-
-        final List<Histogram> expectedNegativeBins = Lists.newArrayList(new Histogram(Arrays.asList(
-                Double.longBitsToDouble(0x8000000000000000L),
-                Double.longBitsToDouble(0xc059000000000000L)
-        )));
-
-        testAggregate("filter", input, expectedPositiveBins, filterParam("lte", "keep", +0.0));
-        testAggregate("filter", input, expectedNegativeBins, filterParam("gte", "keep", -0.0));
+        final List<Histogram> input = Lists.newArrayList(new Histogram(Arrays.asList(100d, 0d, -0d, -110d)));
+        final List<Histogram> expectedPositiveBins = Lists.newArrayList(new Histogram(Arrays.asList(100d, 0d)));
+        testAggregate("filter", input, expectedPositiveBins, filterParam("lte", "keep", +0d));
+        final List<Histogram> expectedNegativeBins = Lists.newArrayList(new Histogram(Arrays.asList(-0d, -110d)));
+        testAggregate("filter", input, expectedNegativeBins, filterParam("gte", "keep", -0d));
     }
 
     @Test

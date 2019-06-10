@@ -140,7 +140,7 @@ public class HistogramFilterAggregator implements Aggregator {
     }
 
     private static boolean isNegative(final double value) {
-        return Double.doubleToLongBits(value) >> 63 < 0;
+        return Double.doubleToLongBits(value) < 0;
     }
 
     private class HistogramFilterDataPointAggregator extends AggregatedDataPointGroupWrapper {
