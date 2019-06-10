@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,7 +63,8 @@ public class HistogramModule extends AbstractModule {
     @Override
     protected void configure() {
         LOGGER.info("Binding HistogramModule");
-        bind(HistogramDataPointFactory.class).in(Scopes.SINGLETON);
+        bind(HistogramDataPointV2Factory.class).in(Scopes.SINGLETON);
+        bind(HistogramDataPointV1Factory.class).in(Scopes.SINGLETON);
 
         bind(DelegatingAvgAggregator.class);
         bind(HistogramMeanAggregator.class);

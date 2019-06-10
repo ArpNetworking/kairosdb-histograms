@@ -42,27 +42,55 @@ public class StorageIT {
     private final CloseableHttpClient _client = HttpClients.createDefault();
 
     @Test
-    public void testStoreDataPoint() throws IOException, JSONException {
+    public void testStoreDataPointNoPrecision() throws IOException, JSONException {
         final Histogram histogram = new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d));
         final int timestamp = 10;
 
         final String metricName = "foo_histogram";
         final HttpPost request = KairosHelper.postHistogram(timestamp, histogram, metricName);
-        final CloseableHttpResponse response = _client.execute(request);
-        Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+        try (CloseableHttpResponse response = _client.execute(request)) {
+            Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 
-        final HttpPost queryRequest = KairosHelper.queryFor(timestamp, timestamp, metricName);
-        final CloseableHttpResponse lookupResponse = _client.execute(queryRequest);
+            final HttpPost queryRequest = KairosHelper.queryFor(timestamp, timestamp, metricName);
+            final CloseableHttpResponse lookupResponse = _client.execute(queryRequest);
 
-        Assert.assertEquals(200, lookupResponse.getStatusLine().getStatusCode());
-        final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
-        final JSONObject responseJson = new JSONObject(body);
-        final JSONObject queryObject = responseJson.getJSONArray("queries").getJSONObject(0);
-        Assert.assertEquals(1, queryObject.getInt("sample_size"));
-        final JSONArray result = queryObject.getJSONArray("results").getJSONObject(0).getJSONArray("values").getJSONArray(0);
-        Assert.assertEquals(timestamp, result.getInt(0));
-        final JSONObject histogramJson = result.getJSONObject(1);
-        final Histogram returnHistogram = new Histogram(histogramJson);
-        Assert.assertEquals(histogram, returnHistogram);
+            Assert.assertEquals(200, lookupResponse.getStatusLine().getStatusCode());
+            final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
+            final JSONObject responseJson = new JSONObject(body);
+            final JSONObject queryObject = responseJson.getJSONArray("queries").getJSONObject(0);
+            Assert.assertEquals(1, queryObject.getInt("sample_size"));
+            final JSONArray result = queryObject.getJSONArray("results").getJSONObject(0).getJSONArray("values").getJSONArray(0);
+            Assert.assertEquals(timestamp, result.getInt(0));
+            final JSONObject histogramJson = result.getJSONObject(1);
+            final Histogram returnHistogram = new Histogram(histogramJson);
+            Assert.assertEquals(histogram, returnHistogram);
+        }
+    }
+
+    @Test
+    public void testStoreDataPoint() throws IOException, JSONException {
+        final Histogram histogram = new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d));
+        histogram.setPrecision((byte) 6);
+        final int timestamp = 10;
+
+        final String metricName = "foo_histogram";
+        final HttpPost request = KairosHelper.postHistogram(timestamp, histogram, metricName);
+        try (CloseableHttpResponse response = _client.execute(request)) {
+            Assert.assertEquals(204, response.getStatusLine().getStatusCode());
+
+            final HttpPost queryRequest = KairosHelper.queryFor(timestamp, timestamp, metricName);
+            final CloseableHttpResponse lookupResponse = _client.execute(queryRequest);
+
+            Assert.assertEquals(200, lookupResponse.getStatusLine().getStatusCode());
+            final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
+            final JSONObject responseJson = new JSONObject(body);
+            final JSONObject queryObject = responseJson.getJSONArray("queries").getJSONObject(0);
+            Assert.assertEquals(1, queryObject.getInt("sample_size"));
+            final JSONArray result = queryObject.getJSONArray("results").getJSONObject(0).getJSONArray("values").getJSONArray(0);
+            Assert.assertEquals(timestamp, result.getInt(0));
+            final JSONObject histogramJson = result.getJSONObject(1);
+            final Histogram returnHistogram = new Histogram(histogramJson);
+            Assert.assertEquals(histogram, returnHistogram);
+        }
     }
 }

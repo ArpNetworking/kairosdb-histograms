@@ -1,5 +1,5 @@
-/**
- * Copyright 2017 SmartSheet.com
+/*
+ * Copyright 2019 Inscope Metrics, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
  */
 package com.arpnetworking.kairosdb;
 
+import com.arpnetworking.kairosdb.proto.v2.DataPointV2;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.json.JSONException;
 import org.json.JSONWriter;
 import org.kairosdb.core.datapoints.DataPointHelper;
@@ -29,7 +33,7 @@ import java.util.TreeMap;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class HistogramDataPointImpl extends DataPointHelper implements HistogramDataPoint {
+public class HistogramDataPointV2Impl extends DataPointHelper implements HistogramDataPoint {
     private static final String API_TYPE = "histogram";
     private final int _precision;
     private final TreeMap<Double, Integer> _map;
@@ -37,6 +41,9 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
     private final double _max;
     private final double _mean;
     private final double _sum;
+    private final long _mask;
+    private final int _finalMask;
+    private final Supplier<Long> _countSupplier;
 
     /**
      * Public constructor.
@@ -49,7 +56,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
      * @param mean the mean value in the histogram
      * @param sum the sum of all the values in the histogram
      */
-    public HistogramDataPointImpl(
+    public HistogramDataPointV2Impl(
             final long timestamp,
             final int precision,
             final TreeMap<Double, Integer> map,
@@ -64,26 +71,49 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         _max = max;
         _mean = mean;
         _sum = sum;
+        _mask = 0xfff0000000000000L >> _precision;
+        _finalMask = (1 << (_precision + 12)) - 1;
+        _countSupplier = Suppliers.memoize(this::computeSampleCount);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("precision", _precision)
+                .add("map", _map)
+                .add("min", _min)
+                .add("max", _max)
+                .add("mean", _mean)
+                .add("sum", _sum)
+                .add("timestamp", m_timestamp)
+                .toString();
     }
 
     @Override
     public void writeValueToBuffer(final DataOutput buffer) throws IOException {
-        buffer.writeInt(_map.size());
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
-            buffer.writeDouble(entry.getKey());
-            buffer.writeInt(entry.getValue());
+        final DataPointV2.DataPoint.Builder builder = DataPointV2.DataPoint.newBuilder();
+
+        for (final Map.Entry<Double, Integer> entry : _map.entrySet()) {
+            builder.putHistogram(pack(entry.getKey()), entry.getValue());
         }
-        buffer.writeDouble(_min);
-        buffer.writeDouble(_max);
-        buffer.writeDouble(_mean);
-        buffer.writeDouble(_sum);
+
+        builder.setMax(_max);
+        builder.setMin(_min);
+        builder.setMean(_mean);
+        builder.setSum(_sum);
+        builder.setPrecision(_precision);
+
+
+        final byte[] bytes = builder.build().toByteArray();
+        buffer.writeInt(bytes.length);
+        buffer.write(bytes);
     }
 
     @Override
     public void writeValueToJson(final JSONWriter writer) throws JSONException {
         writer.object().key("bins");
         writer.object();
-        for (Map.Entry<Double, Integer> entry : _map.entrySet()) {
+        for (final Map.Entry<Double, Integer> entry : _map.entrySet()) {
             writer.key(entry.getKey().toString()).value(entry.getValue());
         }
         writer.endObject();
@@ -91,6 +121,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         writer.key("max").value(_max);
         writer.key("mean").value(_mean);
         writer.key("sum").value(_sum);
+        writer.key("precision").value(_precision);
         writer.endObject();
     }
 
@@ -101,7 +132,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
 
     @Override
     public String getDataStoreDataType() {
-        return HistogramDataPointFactory.DST;
+        return HistogramDataPointV2Factory.DST;
     }
 
     @Override
@@ -124,18 +155,22 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         return 0;
     }
 
-    /**
-     * Gets the number of samples in the bins.
-     *
-     * @return the number of samples
-     */
     @Override
-    public int getSampleCount() {
-        int count = 0;
-        for (Integer binSamples : _map.values()) {
+    public long getSampleCount() {
+        return _countSupplier.get();
+    }
+
+    private long computeSampleCount() {
+        long count = 0;
+        for (final Integer binSamples : _map.values()) {
             count += binSamples;
         }
         return count;
+    }
+
+    @Override
+    public int getPrecision() {
+        return _precision;
     }
 
     @Override
@@ -156,5 +191,15 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
     @Override
     public TreeMap<Double, Integer> getMap() {
         return _map;
+    }
+
+    long pack(final double unpacked) {
+        final long truncated = Double.doubleToRawLongBits(unpacked) & _mask;
+        final long shifted = truncated >> (52 - _precision);
+        return shifted & _finalMask;
+    }
+
+    static double unpack(final long packed, final int precision) {
+        return Double.longBitsToDouble(packed << (52 - precision));
     }
 }

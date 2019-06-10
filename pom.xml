@@ -18,7 +18,7 @@
   <parent>
     <groupId>com.arpnetworking.build</groupId>
     <artifactId>arpnetworking-parent-pom</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.11</version>
     <relativePath />
   </parent>
 
@@ -73,6 +73,8 @@
     <!--Dependency versions-->
     <findbugs.annotations.version>3.0.1</findbugs.annotations.version>
     <aspectjrt.version>1.8.9</aspectjrt.version>
+    <protobuf.version>3.5.1</protobuf.version>
+    <jsr305.version>3.0.2</jsr305.version>
 
     <!-- Test deps -->
     <junit.version>4.12</junit.version>
@@ -80,13 +82,16 @@
     <hamcrest.version>1.3</hamcrest.version>
     <apache.httpclient.version>4.5.3</apache.httpclient.version>
     <apache.httpcore.version>4.4.6</apache.httpcore.version>
+    <metrics.generator.version>1.2.2</metrics.generator.version>
+    <metrics.client.version>0.10.0</metrics.client.version>
+    <apache.math3.version>3.2</apache.math3.version>
 
 
     <!-- Provided by KairosDB
          NOTE: These need to be updated when KairosDB version changes-->
     <guice.version>4.1.0</guice.version>
     <guava.version>19.0</guava.version>
-    <kairosdb.version>1.2.0-1</kairosdb.version>
+    <kairosdb.version>1.2.1-1</kairosdb.version>
     <slf4j.version>1.7.2</slf4j.version>
     <gson.version>2.2.4</gson.version>
     <org.json.version>chargebee-1.0</org.json.version>
@@ -97,6 +102,8 @@
     <docker.maven.plugin.version>0.27.2</docker.maven.plugin.version>
     <maven.assembly.plugin.version>2.6</maven.assembly.plugin.version>
     <rpm.maven.plugin.version>2.1.5</rpm.maven.plugin.version>
+    <protoc.jar.maven.plugin.version>3.5.1.1</protoc.jar.maven.plugin.version>
+
 
     <!-- Code Coverage -->
     <jacoco.check.line.coverage>0.00</jacoco.check.line.coverage>
@@ -105,6 +112,12 @@
     <!-- JVM Debug -->
     <debugJavaOptions />
     <debugJavaPort>9000</debugJavaPort>
+
+    <!-- Findbugs custom exclude, excludes protobuf generated code -->
+    <findbugs.exclude>${project.basedir}/findbugs.exclude.xml</findbugs.exclude>
+
+    <!-- Additional Checkstyle Suppression -->
+    <checkstyleExtraSuppressions>${project.basedir}/checkstyle-extra-suppressions.xml</checkstyleExtraSuppressions>
   </properties>
   <build>
     <resources>
@@ -118,6 +131,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -169,6 +185,18 @@
         <artifactId>wrapper-maven-plugin</artifactId>
         <inherited>false</inherited>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- TODO: The protobuf plugin generates redundant casts, remove the compilerArgs
+               once https://github.com/google/protobuf/issues/1816 is fixed -->
+          <compilerArgs combine.children="append">
+            <arg>-Xlint:-cast</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+
 
       <!-- Project Specific Plugins -->
         <plugin>
@@ -219,6 +247,28 @@
                     </descriptors>
                 </configuration>
             </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <version>${protoc.jar.maven.plugin.version}</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <protocVersion>${protobuf.version}</protocVersion>
+              <includeDirectories>
+                <include>src/main/proto</include>
+              </includeDirectories>
+              <inputDirectories>
+                <include>src/main/proto</include>
+              </inputDirectories>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -305,6 +355,12 @@
   </build>
 
   <dependencies>
+    <!-- Protobuf -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf.version}</version>
+    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -388,6 +444,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>${apache.math3.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
       <version>1.0.0.GA</version>
@@ -400,9 +462,27 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>${jsr305.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore</artifactId>
       <version>${apache.httpcore.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.arpnetworking.metrics</groupId>
+      <artifactId>generator</artifactId>
+      <version>${metrics.generator.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.arpnetworking.metrics</groupId>
+      <artifactId>metrics-client</artifactId>
+      <version>${metrics.client.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

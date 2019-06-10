@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -406,7 +406,7 @@ public class MovingWindowAggregator extends RangeAggregator {
         }
 
         @Override
-        public int getSampleCount() {
+        public long getSampleCount() {
             return _wrappedDataPoint.getSampleCount();
         }
 
@@ -423,6 +423,11 @@ public class MovingWindowAggregator extends RangeAggregator {
         @Override
         public double getMax() {
             return _wrappedDataPoint.getMax();
+        }
+
+        @Override
+        public int getPrecision() {
+            return _wrappedDataPoint.getPrecision();
         }
 
         @Override

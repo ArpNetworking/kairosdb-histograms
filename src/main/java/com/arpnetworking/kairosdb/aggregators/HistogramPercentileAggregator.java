@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.HistogramDataPoint;
-import com.arpnetworking.kairosdb.HistogramDataPointFactory;
+import com.arpnetworking.kairosdb.HistogramDataPointV2Factory;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
@@ -83,7 +83,7 @@ public final class HistogramPercentileAggregator extends RangeAggregator {
 
     @Override
     public boolean canAggregate(final String groupType) {
-        return HistogramDataPointFactory.GROUP_TYPE.equals(groupType);
+        return HistogramDataPointV2Factory.GROUP_TYPE.equals(groupType);
     }
 
     @Override

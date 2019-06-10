@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ public interface HistogramDataPoint extends DataPoint {
      * Getter for sample count contained in this HistogramDataPoint.
      * @return datapoint sample count
      */
-    int getSampleCount();
+    long getSampleCount();
 
     /**
      * Getter for the sum of all samples contained in this HistogramDataPoint.
@@ -50,8 +50,25 @@ public interface HistogramDataPoint extends DataPoint {
     double getMax();
 
     /**
+     * Getter for the precision value of the samples contained in this HistogramDataPoint.
+     * @return precision in bits
+     */
+    int getPrecision();
+
+    /**
      * Getter for the map of lower bucket value to sample count contained in this HistogramDataPoint.
      * @return map of histogram buckets
      */
     NavigableMap<Double, Integer> getMap();
+
+    /**
+     * Truncates a value to the specified bits of precision.
+     * @param val value to truncate
+     * @param precision bits of precision
+     * @return truncated value
+     */
+    static double truncate(final double val, final int precision) {
+        final long mask = 0xfff0000000000000L >> precision;
+        return Double.longBitsToDouble(Double.doubleToRawLongBits(val) & mask);
+    }
 }
