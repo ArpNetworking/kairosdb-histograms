@@ -32,7 +32,7 @@ import javax.inject.Provider;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class DelegatingAggregator implements Aggregator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingRangeAggregator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingAggregator.class);
     private final DelegatingAggregatorMap _aggregatorMap;
 
     /**
@@ -62,6 +62,7 @@ public class DelegatingAggregator implements Aggregator {
         }
 
         final Aggregator aggregator = aggregatorOptional.get();
+        LOGGER.trace("Delegating to a " + aggregator.getClass().getSimpleName());
         setProperties(aggregator);
 
         return aggregator.aggregate(wrapped);

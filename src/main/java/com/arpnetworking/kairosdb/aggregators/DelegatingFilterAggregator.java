@@ -26,7 +26,7 @@ import javax.inject.Named;
 /**
  * Filter aggregator that delegates to the built-in and the histogram aggregators.
  *
- * @author Joey Jackson
+ * @author Joey Jackson (jjackson at dropbox dot com)
  */
 @FeatureComponent(
         name = "filter",
