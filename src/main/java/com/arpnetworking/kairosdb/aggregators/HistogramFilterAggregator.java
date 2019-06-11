@@ -1,5 +1,5 @@
 /**
- *
+ * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import java.util.TreeMap;
 /**
  * Aggregator that filters away some bins of a histogram based on an operation and threshold.
  *
- * @author Joey Jackson
+ * @author Joey Jackson (jjackson at dropbox dot com)
  */
 @FeatureComponent(
         name = "hfilter",
@@ -129,7 +129,15 @@ public class HistogramFilterAggregator implements Aggregator {
         return Double.longBitsToDouble(Double.doubleToRawLongBits(val) & mask);
     }
 
-    private static double binBound(final double val) {
+    /**
+     * Gives an inclusive bound of the bin that the passed in value will be placed in.
+     * If the value is positive, it will be an inclusive upper bound, and if it is negative,
+     * it will be an inclusive lower bound.
+     *
+     * @param val the value whose bucket bound will be calculated
+     * @return the inclusive upper or lower bound of the bin
+     */
+    private static double binInclusiveBound(final double val) {
         long bound = Double.doubleToLongBits(val);
         bound >>= 45;
         bound += 1;
@@ -167,7 +175,7 @@ public class HistogramFilterAggregator implements Aggregator {
                 for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
                     final double binValue = entry.getKey();
                     final int binCount = entry.getValue();
-                    if (!matchesCriteria(binValue)) {
+                    if (!shouldDiscard(binValue)) {
                         filtered.put(binValue, binCount);
                         min = Math.min(min, binValue);
                         max = Math.max(max, binValue);
@@ -178,6 +186,11 @@ public class HistogramFilterAggregator implements Aggregator {
             }
 
             final double mean = sum / count;
+            if (filtered.size() <= 0) {
+                min = Double.NaN;
+                max = Double.NaN;
+                sum = Double.NaN;
+            }
             moveCurrentDataPoint();
             return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum);
         }
@@ -190,17 +203,17 @@ public class HistogramFilterAggregator implements Aggregator {
             }
         }
 
-        private boolean matchesCriteria(final double value) {
+        private boolean shouldDiscard(final double value) {
             final double lowerBound;
             final double upperBound;
             if (isNegative(value)) {
                 //Negative
                 upperBound = truncate(value);
-                lowerBound = binBound(value);
+                lowerBound = binInclusiveBound(value);
             } else {
                 //Positive
                 lowerBound = truncate(value);
-                upperBound = binBound(value);
+                upperBound = binInclusiveBound(value);
             }
 
             if (_filterop == FilterAggregator.FilterOperation.LTE) {
