@@ -15,14 +15,10 @@
  */
 package com.arpnetworking.kairosdb;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.kairosdb.core.KairosDataPointFactory;
 import org.kairosdb.plugin.Aggregator;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import javax.inject.Provider;
 
 /**
@@ -30,11 +26,7 @@ import javax.inject.Provider;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class DelegatingAggregatorMap {
-    private final List<Provider<? extends Aggregator>> _providers;
-    private final Map<String, Optional<Provider<? extends Aggregator>>> _groupMap = Maps.newConcurrentMap();
-    private final Map<String, Optional<Provider<? extends Aggregator>>> _datastoreDataTypeMap = Maps.newConcurrentMap();
-    private final KairosDataPointFactory _dataPointFactory;
+public class DelegatingAggregatorMap extends GenericAggregatorMap<Aggregator> {
 
     /**
      * Public constructor.
@@ -45,42 +37,6 @@ public class DelegatingAggregatorMap {
     public DelegatingAggregatorMap(
             final KairosDataPointFactory dataPointFactory,
             final List<Provider<? extends Aggregator>> aggregators) {
-        _providers = Lists.newArrayList(aggregators);
-        _dataPointFactory = dataPointFactory;
-    }
-
-    /**
-     * Gets an aggregator by group type.
-     *
-     * @param groupType the group type
-     * @return aggregator to use
-     */
-    public Optional<Provider<? extends Aggregator>> aggregatorForGroupType(final String groupType) {
-        return _groupMap.computeIfAbsent(groupType, this::findAggregatorByGroupType);
-    }
-
-    /**
-     * Gets an aggregator by data store data type.
-     *
-     * @param dataStoreDataType the data store data type
-     * @return aggregator to use
-     */
-    public Optional<Aggregator> aggregatorForDataStoreDataType(final String dataStoreDataType) {
-        return _datastoreDataTypeMap.computeIfAbsent(dataStoreDataType, this::findAggregatorByDataStoreDataType).map(Provider::get);
-    }
-
-    private Optional<Provider<? extends Aggregator>> findAggregatorByDataStoreDataType(final String dataStoreDataType) {
-        final String groupType = _dataPointFactory.getFactoryForDataStoreType(dataStoreDataType).getGroupType();
-        return aggregatorForGroupType(groupType);
-    }
-
-    private Optional<Provider<? extends Aggregator>> findAggregatorByGroupType(final String groupType) {
-        for (final Provider<? extends Aggregator> provider : _providers) {
-            final Aggregator aggregator = provider.get();
-            if (aggregator.canAggregate(groupType)) {
-                return Optional.of(provider);
-            }
-        }
-        return Optional.empty();
+        super(dataPointFactory, aggregators);
     }
 }

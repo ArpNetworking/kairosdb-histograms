@@ -220,7 +220,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterLessThanKeepThresholdAtBinBoundaryNegativeBins() {
         runTest(FilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 true, false, 
-                createGroup(createHistogram(1L, NEG_99_5, NEG_100_0), createHistogram(2L, NEG_0_0)));
+                createGroup(createHistogram(1L, NEG_99_5, NEG_100_0),
+                        createHistogram(2L, NEG_0_0)));
     }
 
     @Test
@@ -235,7 +236,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterLessThanKeepThresholdMiddleOfBinNegativeBins() {
         runTest(FilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, false,
-                createGroup(createHistogram(1L, NEG_99_5, NEG_100_0), createHistogram(2L, NEG_0_0)));
+                createGroup(createHistogram(1L, NEG_99_5, NEG_100_0),
+                        createHistogram(2L, NEG_0_0)));
     }
 
     @Test
@@ -257,7 +259,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterLessThanDiscardThresholdMiddleOfBinPositiveBins() {
         runTest(FilterAggregator.FilterOperation.LT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true,
-                createGroup(createHistogram(1L, POS_100_5), createHistogram(2L, POS_512_0, POS_516_0)));
+                createGroup(createHistogram(1L, POS_100_5),
+                        createHistogram(2L, POS_512_0, POS_516_0)));
     }
 
     @Test
@@ -294,14 +297,16 @@ public class HistogramFilterAggregatorTest {
     public void testFilterLessThanOrEqualKeepThresholdMiddleOfBinNegativeBins() {
         runTest(FilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, false,
-                createGroup(createHistogram(1L, NEG_99_5, NEG_100_0), createHistogram(2L, NEG_0_0)));
+                createGroup(createHistogram(1L, NEG_99_5, NEG_100_0),
+                        createHistogram(2L, NEG_0_0)));
     }
 
     @Test
     public void testFilterLessThanOrEqualDiscardThresholdAtBinBoundaryPositiveBins() {
         runTest(FilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 true, true,
-                createGroup(createHistogram(1L, POS_100_5), createHistogram(2L, POS_512_0, POS_516_0)));
+                createGroup(createHistogram(1L, POS_100_5),
+                        createHistogram(2L, POS_512_0, POS_516_0)));
     }
 
     @Test
@@ -315,7 +320,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterLessThanOrEqualDiscardThresholdMiddleOfBinPositiveBins() {
         runTest(FilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, true,
-                createGroup(createHistogram(1L, POS_100_5), createHistogram(2L, POS_512_0, POS_516_0)));
+                createGroup(createHistogram(1L, POS_100_5),
+                        createHistogram(2L, POS_512_0, POS_516_0)));
     }
 
     @Test
@@ -329,7 +335,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterGreaterThanKeepThresholdAtBinBoundaryPositiveBins() {
         runTest(FilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 true, true,
-                createGroup(createHistogram(1L, POS_99_5, POS_100_0), createHistogram(2L, POS_0_0)));
+                createGroup(createHistogram(1L, POS_99_5, POS_100_0),
+                        createHistogram(2L, POS_0_0)));
     }
 
     @Test
@@ -344,7 +351,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterGreaterThanKeepThresholdMiddleOfBinPositiveBins() {
         runTest(FilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, true,
-                createGroup(createHistogram(1L, POS_99_5, POS_100_0), createHistogram(2L, POS_0_0)));
+                createGroup(createHistogram(1L, POS_99_5, POS_100_0),
+                        createHistogram(2L, POS_0_0)));
     }
 
     @Test
@@ -381,7 +389,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterGreaterThanDiscardThresholdMiddleOfBinNegativeBins() {
         runTest(FilterAggregator.FilterOperation.GT, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false,
-                createGroup(createHistogram(1L, NEG_100_5), createHistogram(2L, NEG_512_0, NEG_516_0)));
+                createGroup(createHistogram(1L, NEG_100_5),
+                        createHistogram(2L, NEG_512_0, NEG_516_0)));
     }
 
     @Test
@@ -403,7 +412,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterGreaterThanOrEqualKeepThresholdMiddleOfBinPositiveBins() {
         runTest(FilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 false, true,
-                createGroup(createHistogram(1L, POS_99_5, POS_100_0), createHistogram(2L, POS_0_0)));
+                createGroup(createHistogram(1L, POS_99_5, POS_100_0),
+                        createHistogram(2L, POS_0_0)));
     }
 
     @Test
@@ -425,7 +435,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterGreaterThanOrEqualDiscardThresholdAtBinBoundaryNegativeBins() {
         runTest(FilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 true, false,
-                createGroup(createHistogram(1L, NEG_100_5), createHistogram(2L, NEG_512_0, NEG_516_0)));
+                createGroup(createHistogram(1L, NEG_100_5),
+                        createHistogram(2L, NEG_512_0, NEG_516_0)));
     }
 
     @Test
@@ -439,7 +450,8 @@ public class HistogramFilterAggregatorTest {
     public void testFilterGreaterThanOrEqualDiscardThresholdMiddleOfBinNegativeBins() {
         runTest(FilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false,
-                createGroup(createHistogram(1L, NEG_100_5), createHistogram(2L, NEG_512_0, NEG_516_0)));
+                createGroup(createHistogram(1L, NEG_100_5),
+                        createHistogram(2L, NEG_512_0, NEG_516_0)));
     }
 
     @Test

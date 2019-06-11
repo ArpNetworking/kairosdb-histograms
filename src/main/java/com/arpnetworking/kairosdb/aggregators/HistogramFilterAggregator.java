@@ -124,7 +124,7 @@ public class HistogramFilterAggregator implements Aggregator {
         return HistogramDataPointFactory.GROUP_TYPE;
     }
 
-    static double truncate(final double val) {
+    private static double truncate(final double val) {
         final long mask = 0xffffe00000000000L;
         return Double.longBitsToDouble(Double.doubleToRawLongBits(val) & mask);
     }
