@@ -39,6 +39,9 @@ public class HistogramPercentRemainingAggregator implements Aggregator {
 
     /**
      * Public Constructor.
+     *
+     * @param dataPointFactory A factory for creating DoubleDataPoints
+     * @throws KairosDBException on error
      */
     @Inject
     public HistogramPercentRemainingAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
