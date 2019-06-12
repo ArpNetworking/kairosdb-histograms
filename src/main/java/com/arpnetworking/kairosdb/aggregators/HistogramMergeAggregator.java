@@ -79,8 +79,9 @@ public final class HistogramMergeAggregator extends RangeAggregator {
                     for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
                         merged.compute(entry.getKey(), (key, existing) ->  entry.getValue() + (existing == null ? 0 : existing));
                         count += entry.getValue();
-                        originalCount += hist.getOriginalCount();
                     }
+
+                    originalCount += hist.getOriginalCount();
 
                     min = Math.min(min, hist.getMin());
                     max = Math.max(max, hist.getMax());

@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.AggregatedDataPointGroupWrapper;
 import org.kairosdb.core.annotation.FeatureComponent;
+import org.kairosdb.core.datapoints.DoubleDataPoint;
 import org.kairosdb.core.datapoints.DoubleDataPointFactory;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.core.exception.KairosDBException;
@@ -75,12 +76,16 @@ public class HistogramPercentRemainingAggregator implements Aggregator {
         public DataPoint next() {
             if (currentDataPoint instanceof HistogramDataPoint) {
                 final HistogramDataPoint dp = (HistogramDataPoint) currentDataPoint;
-                final double percent = dp.getSampleCount() / dp.getOriginalCount();
+                final double percent;
+                if (dp.getOriginalCount() > 0) {
+                    percent = (double) dp.getSampleCount() / dp.getOriginalCount();
+                } else {
+                    percent = -1; //Should never start with an empty histogram
+                }
                 moveCurrentDataPoint();
-                return _dataPointFactory.createDataPoint(currentDataPoint.getTimestamp(), percent);
+                return _dataPointFactory.createDataPoint(dp.getTimestamp(), percent);
             } else {
-                moveCurrentDataPoint();
-                return _dataPointFactory.createDataPoint(currentDataPoint.getTimestamp(), 1d);
+                throw new IllegalArgumentException("Cannot compute percent remaining of non histogram data point");
             }
         }
 
