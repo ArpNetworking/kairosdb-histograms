@@ -51,12 +51,22 @@ public class HistogramFilterAggregator implements Aggregator {
          * Keep the individual buckets in the data point group if it is indeterminate if they should be filtered by the
          * specific query.
          */
-        KEEP,
+        KEEP {
+            boolean shouldDiscard(final boolean thresholdAcceptsLowerBound, final boolean thresholdAcceptsUpperBound) {
+                return thresholdAcceptsLowerBound && thresholdAcceptsUpperBound;
+            }
+        },
         /**
          * Discard the individual buckets in the data point group if it is indeterminate if they should be filtered by
          * the specific query.
          */
-        DISCARD
+        DISCARD {
+            boolean shouldDiscard(final boolean thresholdAcceptsLowerBound, final boolean thresholdAcceptsUpperBound) {
+                return thresholdAcceptsLowerBound || thresholdAcceptsUpperBound;
+            }
+        };
+
+        abstract boolean shouldDiscard(boolean thresholdAcceptsLowerBound, boolean thresholdAcceptsUpperBound);
     }
 
     @FeatureProperty(
@@ -216,37 +226,31 @@ public class HistogramFilterAggregator implements Aggregator {
                 upperBound = binInclusiveBound(value);
             }
 
-            if (_filterop == FilterAggregator.FilterOperation.LTE) {
-                if (_filterinc == FilterIndeterminate.DISCARD) {
-                    return lowerBound <= _threshold;
-                } else if (_filterinc == FilterIndeterminate.KEEP) {
-                    return upperBound <= _threshold;
-                }
-            } else if (_filterop == FilterAggregator.FilterOperation.LT) {
-                if (_filterinc == FilterIndeterminate.DISCARD) {
-                    return lowerBound < _threshold;
-                } else if (_filterinc == FilterIndeterminate.KEEP) {
-                    return upperBound < _threshold;
-                }
-            } else if (_filterop == FilterAggregator.FilterOperation.GTE) {
-                if (_filterinc == FilterIndeterminate.DISCARD) {
-                    return upperBound >= _threshold;
-                } else if (_filterinc == FilterIndeterminate.KEEP) {
-                    return lowerBound >= _threshold;
-                }
-            } else if (_filterop == FilterAggregator.FilterOperation.GT) {
-                if (_filterinc == FilterIndeterminate.DISCARD) {
-                    return upperBound > _threshold;
-                } else if (_filterinc == FilterIndeterminate.KEEP) {
-                    return lowerBound > _threshold;
-                }
-            } else if (_filterop == FilterAggregator.FilterOperation.EQUAL) {
-                if (_filterinc == FilterIndeterminate.DISCARD) {
-                    return _threshold >= lowerBound && _threshold <= upperBound;
-                } else if (_filterinc == FilterIndeterminate.KEEP) {
-                    return false;
-                }
-
+            final boolean thresholdAcceptsLowerBound;
+            final boolean thresholdAcceptsUpperBound;
+            switch (_filterop) {
+                case LTE:
+                    thresholdAcceptsLowerBound = lowerBound <= _threshold;
+                    thresholdAcceptsUpperBound = upperBound <= _threshold;
+                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                case LT:
+                    thresholdAcceptsLowerBound = lowerBound < _threshold;
+                    thresholdAcceptsUpperBound = upperBound < _threshold;
+                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                case GTE:
+                    thresholdAcceptsLowerBound = lowerBound >= _threshold;
+                    thresholdAcceptsUpperBound = upperBound >= _threshold;
+                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                case GT:
+                    thresholdAcceptsLowerBound = lowerBound > _threshold;
+                    thresholdAcceptsUpperBound = upperBound > _threshold;
+                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                default: // EQUAL
+                    if (_filterinc == FilterIndeterminate.DISCARD) {
+                        return _threshold >= lowerBound && _threshold <= upperBound;
+                    } else if (_filterinc == FilterIndeterminate.KEEP) {
+                        return false;
+                    }
             }
             return false;
         }
