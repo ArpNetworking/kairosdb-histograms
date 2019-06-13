@@ -225,7 +225,7 @@ public class HistogramFilterAggregator implements Aggregator {
                 lowerBound = truncate(value);
                 upperBound = binInclusiveBound(value);
             }
-
+            
             final boolean thresholdAcceptsLowerBound;
             final boolean thresholdAcceptsUpperBound;
             switch (_filterop) {
