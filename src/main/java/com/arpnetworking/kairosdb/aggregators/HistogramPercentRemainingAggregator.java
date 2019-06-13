@@ -21,7 +21,6 @@ import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.AggregatedDataPointGroupWrapper;
 import org.kairosdb.core.annotation.FeatureComponent;
-import org.kairosdb.core.datapoints.DoubleDataPoint;
 import org.kairosdb.core.datapoints.DoubleDataPointFactory;
 import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.core.exception.KairosDBException;
@@ -30,10 +29,10 @@ import org.kairosdb.plugin.Aggregator;
 /**
  * Aggregator that filters away some bins of a histogram based on an operation and threshold.
  *
- * @author Joey Jackson
+ * @author Joey Jackson (jjackson at dropbox dot com)
  */
 @FeatureComponent(
-        name = "hpercentremaining",
+        name = "percent_remaining",
         description = "Calculates the percent remaining of the original data points in a histogram")
 public class HistogramPercentRemainingAggregator implements Aggregator {
     private final DoubleDataPointFactory _dataPointFactory;
