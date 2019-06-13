@@ -278,70 +278,72 @@ public class AggregationIT {
     // **** percent remaining aggregator ***
     @Test
     public void testPercentRemainingAggregatorSolo() throws IOException, JSONException {
-        testAggregate("percent_remaining", SINGLE_HIST_TEST_DATA, 1d);
+        testAggregate("percent_remaining", SINGLE_HIST_TEST_DATA, 1d, Collections.emptyMap());
     }
 
     @Test
     public void testPercentRemainingAggregatorMulti() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregateToDoubles("percent_remaining", MULTI_HIST_TEST_DATA, );
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Lists.newArrayList(0.166666, 0.666666),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 10d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     @Test
     public void testPercentRemainingAggregatorFilterAll() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Lists.newArrayList(0d, 0d),
+                new AggregatorAndParams("filter", filterParam("gt", "keep", 0d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     @Test
     public void testPercentRemainingAggregatorFilterNone() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Lists.newArrayList(1d, 1d),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 0d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     @Test
     public void testPercentRemainingAggregatorMergeAll() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Collections.singletonList(1d),
+                new AggregatorAndParams("merge", samplingParam()),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     @Test
     public void testPercentRemainingAggregatorMergeSome() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Arrays.asList(1d, 1d),
+                new AggregatorAndParams("merge", Collections.emptyMap()),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     @Test
     public void testPercentRemainingAggregatorFilterThenMerge() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Collections.singletonList(0.666666),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 5d)),
+                new AggregatorAndParams("merge", samplingParam()),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     @Test
     public void testPercentRemainingAggregatorMergeThenFilter() throws IOException, JSONException {
-        //TODO
-//        final List<Histogram> expected = Lists.newArrayList(
-//                new Histogram(Arrays.asList(9d, 9d, 8d, 12d)),
-//                new Histogram(Arrays.asList(18d, 18d, 20d, 20d)));
-//        testAggregate("filter", MULTI_HIST_TEST_DATA, expected, filterParam("lt", "keep", 5d));
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Collections.singletonList(0.666666),
+                new AggregatorAndParams("merge", samplingParam()),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 5d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
     }
 
     private Map<String, Object> samplingParam() {
@@ -488,22 +490,26 @@ public class AggregationIT {
         verifyQueryResponse(histograms.size(), expected, body);
     }
 
-    //TODO
-//    private void testAggregateToDoubles(
-//            final List<Histogram> histograms,
-//            final List<Double> expected,
-//            final AggregatorAndParams... aggregators)
-//            throws JSONException, IOException {
-//        final String metricName = newMetricName(aggregator);
-//
-//        int i = 1;
-//        for (final Histogram histogram : histograms) {
-//            postHistogramWithExpectedCode(metricName, i++, histogram, 204);
-//        }
-//
-//        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), aggregator, aggParams, 200);
-//        verifyQueryResponseDouble(histograms.size(), expected, body);
-//    }
+    private void testAggregateToDoubles(
+            final List<Histogram> histograms,
+            final List<Double> expected,
+            final AggregatorAndParams... aggregators)
+            throws JSONException, IOException {
+        if (aggregators.length < 1) {
+            throw new IllegalArgumentException("Must specify at least one aggregator");
+        }
+
+        final String metricName = newMetricName(aggregators[aggregators.length - 1].getAggregator());
+
+        int i = 1;
+        for (final Histogram histogram : histograms) {
+            postHistogramWithExpectedCode(metricName, i++, histogram, 204);
+        }
+
+        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), 200,
+                aggregators);
+        verifyQueryResponseDouble(histograms.size(), expected, body);
+    }
 
     private void verifyQueryResponse(
             final int expectedSamples,
@@ -571,7 +577,7 @@ public class AggregationIT {
             Assert.assertEquals(i + 1, jsonPair.getInt(0));
             final Double actual = jsonPair.getDouble(1);
 
-            Assert.assertEquals(expectedResult.get(i), actual);
+            Assert.assertEquals(expectedResult.get(i), actual, 0.000001);
         }
     }
 
@@ -623,19 +629,17 @@ public class AggregationIT {
         }
     }
 
-    //TODO
-//    private String queryWithExpectedCode(
-//            final long endTime,
-//            final String aggregator,
-//            final int expectedCode,
-//            final AggregatorAndParams... aggregators)
-//            throws JSONException, IOException {
-//        final JSONObject params = new JSONObject(aggParams);
-//        final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregator, params);
-//        try (CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
-//            final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
-//            Assert.assertEquals("response: " + body, expectedCode, lookupResponse.getStatusLine().getStatusCode());
-//            return body;
-//        }
-//    }
+    private String queryWithExpectedCode(
+            final String metricName,
+            final long endTime,
+            final int expectedCode,
+            final AggregatorAndParams... aggregators)
+            throws JSONException, IOException {
+        final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregators);
+        try (CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
+            final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
+            Assert.assertEquals("response: " + body, expectedCode, lookupResponse.getStatusLine().getStatusCode());
+            return body;
+        }
+    }
 }

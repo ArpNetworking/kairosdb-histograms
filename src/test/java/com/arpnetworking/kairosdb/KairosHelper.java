@@ -21,6 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.kairosdb.testing.AggregatorAndParams;
 
 import java.io.UnsupportedEncodingException;
 
@@ -137,6 +138,53 @@ public final class KairosHelper {
         aggregators.put(aggregatorJson);
         final JSONObject query = queryJsonFor(startTimestamp, endTimestamp, metric);
         query.getJSONArray("metrics").getJSONObject(0).put("aggregators", aggregators);
+
+        final HttpPost lookup = new HttpPost(KairosHelper.getEndpoint() + "/api/v1/datapoints/query");
+        try {
+            lookup.setEntity(new StringEntity(query.toString()));
+        } catch (final UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        return lookup;
+    }
+
+    /**
+     * Creates the JSON body for a datapoint query.
+     *
+     * @param startTimestamp starting timestamp
+     * @param endTimestamp ending timestamp
+     * @param metric metric to query for
+     * @param aggregators the list of aggregators to be applied in order for the query
+     * @return JSON Object to POST to KairosDB
+     * @throws JSONException on JSON error
+     */
+    public static HttpPost queryFor(
+            final long startTimestamp,
+            final long endTimestamp,
+            final String metric,
+            final AggregatorAndParams... aggregators)
+            throws JSONException {
+
+        final JSONArray aggregatorList = new JSONArray();
+        for (AggregatorAndParams aggregatorAndParams : aggregators) {
+            final JSONObject aggregatorJson = new JSONObject();
+            aggregatorJson.put("name", aggregatorAndParams.getAggregator());
+
+            if (aggregatorAndParams.getParams() != null) {
+                final JSONObject aggregatorParameters = new JSONObject(aggregatorAndParams.getParams());
+                final JSONArray names = aggregatorParameters.names();
+                if (names != null) {
+                    for (int i = 0; i < names.length(); i++) {
+                        aggregatorJson.putOnce((String) names.get(i), aggregatorParameters.get((String) names.get(i)));
+                    }
+                }
+            }
+
+            aggregatorList.put(aggregatorJson);
+        }
+
+        final JSONObject query = queryJsonFor(startTimestamp, endTimestamp, metric);
+        query.getJSONArray("metrics").getJSONObject(0).put("aggregators", aggregatorList);
 
         final HttpPost lookup = new HttpPost(KairosHelper.getEndpoint() + "/api/v1/datapoints/query");
         try {

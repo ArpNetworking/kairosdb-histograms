@@ -18,8 +18,9 @@ package org.kairosdb.testing;
 import java.util.Map;
 
 /**
- * Container class to hold an aggregator and its associated parameters for a query
+ * Container class to hold an aggregator and its associated parameters for a query.
  *
+ * @author Joey Jackson (jjackson at dropbox dot com)
  */
 public class AggregatorAndParams {
     private String _aggregator;
@@ -31,16 +32,16 @@ public class AggregatorAndParams {
      * @param aggregator the aggregator type
      * @param params the parameters for the aggregator
      */
-    public AggregatorAndParams(String aggregator, Map<String, ?> params) {
+    public AggregatorAndParams(final String aggregator, final Map<String, ?> params) {
         this._aggregator = aggregator;
         this._params = params;
     }
 
-    public String get_aggregator() {
+    public final String getAggregator() {
         return _aggregator;
     }
 
-    public Map<String, ?> get_params() {
+    public final Map<String, ?> getParams() {
         return _params;
     }
 }
