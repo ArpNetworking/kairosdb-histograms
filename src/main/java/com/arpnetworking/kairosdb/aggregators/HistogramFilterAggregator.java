@@ -217,15 +217,30 @@ public class HistogramFilterAggregator implements Aggregator {
             final double lowerBound;
             final double upperBound;
             if (isNegative(value)) {
-                //Negative
                 upperBound = truncate(value);
                 lowerBound = binInclusiveBound(value);
             } else {
-                //Positive
                 lowerBound = truncate(value);
                 upperBound = binInclusiveBound(value);
             }
-            
+
+            //=================================================================
+            /*
+             * TODO
+             * Dependent on changes in
+            if (_filterop == FilterAggregator.FilterOperation.EQUAL) {
+                if (_filterinc == FilterIndeterminate.DISCARD) {
+                    return _threshold >= lowerBound && _threshold <= upperBound;
+                } else if (_filterinc == FilterIndeterminate.KEEP) {
+                    return false;
+                }
+            } else {
+                final boolean thresholdAcceptsLowerBound = _filterop.compare(lowerBound, _threshold);
+                final boolean thresholdAcceptsUpperBound = _filterop.compare(upperBound, _threshold);
+                return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+            }
+            */
+            //=================================================================
             final boolean thresholdAcceptsLowerBound;
             final boolean thresholdAcceptsUpperBound;
             switch (_filterop) {
@@ -253,6 +268,7 @@ public class HistogramFilterAggregator implements Aggregator {
                     }
             }
             return false;
+            //=================================================================
         }
     }
 }
