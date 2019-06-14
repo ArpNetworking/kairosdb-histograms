@@ -134,7 +134,7 @@ public class HistogramFilterAggregator implements Aggregator {
         return HistogramDataPointFactory.GROUP_TYPE;
     }
 
-    private static double truncate(final double val) {
+    static double truncate(final double val) {
         final long mask = 0xffffe00000000000L;
         return Double.longBitsToDouble(Double.doubleToRawLongBits(val) & mask);
     }
@@ -196,7 +196,7 @@ public class HistogramFilterAggregator implements Aggregator {
             }
 
             final double mean;
-            if (filtered.size() <= 0 || count == 0) {
+            if (count == 0) {
                 // No bins exist or all bins have count of zero
                 min = Double.NaN;
                 max = Double.NaN;

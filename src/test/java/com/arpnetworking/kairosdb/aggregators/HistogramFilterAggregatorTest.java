@@ -37,23 +37,31 @@ import java.util.TreeMap;
 public class HistogramFilterAggregatorTest {
     private HistogramFilterAggregator _aggregator;
 
-    private static final double NEG_516_0 = Double.longBitsToDouble(0xc080200000000000L);  //-516.0
-    private static final double NEG_512_0 = Double.longBitsToDouble(0xc080000000000000L);  //-512.0
-    private static final double NEG_100_5 = Double.longBitsToDouble(0xc059200000000000L);  //-100.5
-    private static final double NEG_100_01 = Double.longBitsToDouble(0xc0590000FFFFFFFFL); //-100.01
-    private static final double NEG_100_0 = Double.longBitsToDouble(0xc059000000000000L);  //-100.0
-    private static final double NEG_99_5 = Double.longBitsToDouble(0xc058e00000000000L);   // -99.5
-    private static final double NEG_1EN308 = Double.longBitsToDouble(0x8000200000000000L); //  -1.e-308
-    private static final double NEG_0_0 = Double.longBitsToDouble(0x8000000000000000L);    //  -0.0
-    private static final double POS_0_0 = Double.longBitsToDouble(0x0000000000000000L);    //   0.0
-    private static final double POS_1EN308 = Double.longBitsToDouble(0x0000200000000000L); //   1.e-308
-    private static final double POS_99_5 = Double.longBitsToDouble(0x4058e00000000000L);   //  99.5
-    private static final double POS_100_0 = Double.longBitsToDouble(0x4059000000000000L);  // 100.0
-    private static final double POS_100_01 = Double.longBitsToDouble(0x40590000FFFFFFFFL); // 100.01
-    private static final double POS_100_5 = Double.longBitsToDouble(0x4059200000000000L);  // 100.6
-    private static final double POS_512_0 = Double.longBitsToDouble(0x4080000000000000L);  // 512.0
-    private static final double POS_516_0 = Double.longBitsToDouble(0x4080200000000000L);  // 516.0
-    
+    private static final double NEG_516_0 = HistogramFilterAggregator.truncate(-516.0);
+    private static final double NEG_512_0 = HistogramFilterAggregator.truncate(-512.0);
+    private static final double NEG_100_5 = HistogramFilterAggregator.truncate(-100.5);
+    private static final double NEG_100_01 = -100.01; // Middle of bin
+    private static final double NEG_100_0 = HistogramFilterAggregator.truncate(-100.0);
+    private static final double NEG_99_5 = HistogramFilterAggregator.truncate(-99.5);
+    private static final double NEG_1EN310 = nextLargestBin(-0.0);
+    private static final double NEG_0_0 = HistogramFilterAggregator.truncate(-0.0);
+    private static final double POS_0_0 = HistogramFilterAggregator.truncate(0.0);
+    private static final double POS_1EN310 = nextLargestBin(0.0);
+    private static final double POS_99_5 = HistogramFilterAggregator.truncate(99.5);
+    private static final double POS_100_0 = HistogramFilterAggregator.truncate(100.0);
+    private static final double POS_100_01 = 100.01; // Middle of bin
+    private static final double POS_100_5 = HistogramFilterAggregator.truncate(100.5);
+    private static final double POS_512_0 = HistogramFilterAggregator.truncate(512.0);
+    private static final double POS_516_0 = HistogramFilterAggregator.truncate(516);
+
+    private static double nextLargestBin(final double val) {
+        long bound = Double.doubleToLongBits(val);
+        bound >>= 45;
+        bound += 1;
+        bound <<= 45;
+        return Double.longBitsToDouble(bound);
+    }
+
     private void assertGroupsEqual(final DataPointGroup expected, final DataPointGroup actual) {
         while (expected.hasNext()) {
             Assert.assertTrue("Actual group is missing data points", actual.hasNext());
@@ -193,17 +201,17 @@ public class HistogramFilterAggregatorTest {
         DataPointGroup group, expected, results;
         _aggregator.setFilterIndeterminateInclusion(HistogramFilterAggregator.FilterIndeterminate.KEEP);
 
-        group = createGroup(createHistogram(1L, POS_1EN308, POS_0_0, NEG_0_0, NEG_1EN308));
+        group = createGroup(createHistogram(1L, POS_1EN310, POS_0_0, NEG_0_0, NEG_1EN310));
         _aggregator.setFilterOp(FilterAggregator.FilterOperation.LTE);
         _aggregator.setThreshold(POS_0_0);
-        expected = createGroup(createHistogram(1L, POS_1EN308, POS_0_0));
+        expected = createGroup(createHistogram(1L, POS_1EN310, POS_0_0));
         results = _aggregator.aggregate(group);
         assertGroupsEqual(expected, results);
 
-        group = createGroup(createHistogram(1L, POS_1EN308, POS_0_0, NEG_0_0, NEG_1EN308));
+        group = createGroup(createHistogram(1L, POS_1EN310, POS_0_0, NEG_0_0, NEG_1EN310));
         _aggregator.setFilterOp(FilterAggregator.FilterOperation.GTE);
         _aggregator.setThreshold(NEG_0_0);
-        expected = createGroup(createHistogram(1L, NEG_0_0, NEG_1EN308));
+        expected = createGroup(createHistogram(1L, NEG_0_0, NEG_1EN310));
         results = _aggregator.aggregate(group);
         assertGroupsEqual(expected, results);
     }
