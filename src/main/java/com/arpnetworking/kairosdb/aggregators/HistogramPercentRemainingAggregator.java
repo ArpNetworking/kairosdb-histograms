@@ -26,6 +26,8 @@ import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.core.exception.KairosDBException;
 import org.kairosdb.plugin.Aggregator;
 
+import java.util.NoSuchElementException;
+
 /**
  * Aggregator that filters away some bins of a histogram based on an operation and threshold.
  *
@@ -73,6 +75,9 @@ public class HistogramPercentRemainingAggregator implements Aggregator {
         }
 
         public DataPoint next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             if (currentDataPoint instanceof HistogramDataPoint) {
                 final HistogramDataPoint dp = (HistogramDataPoint) currentDataPoint;
                 final double percent;

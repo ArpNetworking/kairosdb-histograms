@@ -68,6 +68,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         _originalCount = getSampleCount();
     }
 
+
     /**
      * Public constructor.
      *
@@ -80,6 +81,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
      * @param sum the sum of all the values in the histogram
      * @param originalCount the original number of data points that this histogram represented
      */
+    // CHECKSTYLE.OFF: ParameterNumber
     public HistogramDataPointImpl(
             final long timestamp,
             final int precision,
@@ -98,6 +100,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         _sum = sum;
         _originalCount = originalCount;
     }
+    // CHECKSTYLE.ON: ParameterNumber
 
     @Override
     public void writeValueToBuffer(final DataOutput buffer) throws IOException {
