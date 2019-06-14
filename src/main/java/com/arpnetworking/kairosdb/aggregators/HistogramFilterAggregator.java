@@ -197,11 +197,15 @@ public class HistogramFilterAggregator implements Aggregator {
                 }
             }
 
-            final double mean = sum / count;
-            if (filtered.size() <= 0) {
+            final double mean;
+            if (filtered.size() <= 0 || count == 0) {
+                // No bins exist or all bins have count of zero
                 min = Double.NaN;
                 max = Double.NaN;
                 sum = Double.NaN;
+                mean = Double.NaN;
+            } else {
+                mean = sum / count;
             }
             moveCurrentDataPoint();
             return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum, originalCount);
@@ -269,14 +273,17 @@ public class HistogramFilterAggregator implements Aggregator {
                     thresholdAcceptsLowerBound = lowerBound > _threshold;
                     thresholdAcceptsUpperBound = upperBound > _threshold;
                     return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
-                default: // EQUAL
+                case EQUAL:
                     if (_filterinc == FilterIndeterminate.DISCARD) {
                         return _threshold >= lowerBound && _threshold <= upperBound;
                     } else if (_filterinc == FilterIndeterminate.KEEP) {
                         return false;
+                    } else {
+                        throw new IllegalStateException("Unsupported FilterIndeterminateInclusion Enum type");
                     }
+                default:
+                    throw new IllegalStateException("Unsupported FilterOp Enum type");
             }
-            return false;
             //=================================================================
         }
     }
