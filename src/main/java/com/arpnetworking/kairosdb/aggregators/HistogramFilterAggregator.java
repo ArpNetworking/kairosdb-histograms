@@ -147,7 +147,7 @@ public class HistogramFilterAggregator implements Aggregator {
      * @param val the value whose bucket bound will be calculated
      * @return the inclusive upper or lower bound of the bin
      */
-    private static double binInclusiveBound(final double val) {
+    static double binInclusiveBound(final double val) {
         long bound = Double.doubleToLongBits(val);
         bound >>= 45;
         bound += 1;
@@ -171,8 +171,7 @@ public class HistogramFilterAggregator implements Aggregator {
         }
 
         public DataPoint next() {
-            final DataPoint dp = currentDataPoint;
-            final long timeStamp = dp.getTimestamp();
+            final long timeStamp = currentDataPoint.getTimestamp();
             final TreeMap<Double, Integer> filtered = Maps.newTreeMap();
             double min = Double.MAX_VALUE;
             double max = -Double.MAX_VALUE;
@@ -180,23 +179,32 @@ public class HistogramFilterAggregator implements Aggregator {
             long count = 0;
             int originalCount = 0;
 
-            if (dp instanceof HistogramDataPoint) {
-                final HistogramDataPoint hist = (HistogramDataPoint) dp;
+            if (currentDataPoint instanceof HistogramDataPoint) {
+                final HistogramDataPoint hist = (HistogramDataPoint) currentDataPoint;
                 originalCount = hist.getOriginalCount();
 
-                for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
-                    final double binValue = entry.getKey();
-                    final int binCount = entry.getValue();
-                    if (!shouldDiscard(binValue)) {
-                        filtered.put(binValue, binCount);
-                        min = Math.min(min, binValue);
-                        max = Math.max(max, binValue);
-                        sum += binValue * binCount;
-                        count += binCount;
+                if (histNotChangedByThreshold(hist)) {
+                    final DataPoint ret = currentDataPoint;
+                    moveCurrentDataPoint();
+                    return ret;
+                } else {
+                    for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
+                        if (!shouldDiscard(entry.getKey())) {
+                            filtered.put(entry.getKey(), entry.getValue());
+                            min = Math.min(min, Math.min(entry.getKey(), binInclusiveBound(entry.getKey())));
+                            max = Math.max(max, Math.max(entry.getKey(), binInclusiveBound(entry.getKey())));
+                            sum += entry.getKey() * entry.getValue();
+                            count += entry.getValue();
+                        }
+                    }
+                    if (minNotChangedByThreshold(hist)) {
+                        min = hist.getMin();
+                    }
+                    if (maxNotChangedByThreshold(hist)) {
+                        max = hist.getMax();
                     }
                 }
             }
-
             final double mean;
             if (count == 0) {
                 // No bins exist or all bins have count of zero
@@ -216,6 +224,50 @@ public class HistogramFilterAggregator implements Aggregator {
                 currentDataPoint = nextInternal();
             } else {
                 currentDataPoint = null;
+            }
+        }
+
+        private boolean histNotChangedByThreshold(final HistogramDataPoint hist) {
+            switch (_filterop) {
+                case GT:
+                    return _threshold >= hist.getMax();
+                case GTE:
+                    return _threshold > hist.getMax();
+                case LT:
+                    return _threshold <= hist.getMin();
+                case LTE:
+                    return _threshold < hist.getMin();
+                case EQUAL:
+                    return _threshold < hist.getMin() || hist.getMax() < _threshold
+                            && _filterinc == FilterIndeterminate.DISCARD;
+                default:
+                    throw new IllegalStateException("Unsupported FilterOp Enum type");
+            }
+        }
+
+        private boolean minNotChangedByThreshold(final HistogramDataPoint hist) {
+            switch (_filterop) {
+                case LT:
+                    return _threshold <= hist.getMin();
+                case LTE:
+                    return _threshold < hist.getMin();
+                case EQUAL:
+                    return !shouldDiscard(hist.getMin());
+                default:
+                    return true;
+            }
+        }
+
+        private boolean maxNotChangedByThreshold(final HistogramDataPoint hist) {
+            switch (_filterop) {
+                case GT:
+                    return _threshold >= hist.getMax();
+                case GTE:
+                    return _threshold > hist.getMax();
+                case EQUAL:
+                    return !shouldDiscard(hist.getMax());
+                default:
+                    return true;
             }
         }
 
