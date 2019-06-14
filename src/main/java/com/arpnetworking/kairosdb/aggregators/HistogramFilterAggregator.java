@@ -226,8 +226,15 @@ public class HistogramFilterAggregator implements Aggregator {
 
             //=================================================================
             /*
-             * TODO
-             * Dependent on changes in
+             * TODO(Joey Jackson):
+             *  DESC. The refactored code below uses the .compare method added to the
+             *  FilterOp Enum in the base KairosDB library. The pull request listed below
+             *  must be merged before this cleaner version of the code can be used. Until then,
+             *  the code below is incompatible with the base KairosDB library, but is compatible
+             *  with the fork by ddimensia.
+             *  Ref:
+             *      https://github.com/kairosdb/kairosdb/pull/555
+             *      https://github.com/ddimensia/kairosdb
             if (_filterop == FilterAggregator.FilterOperation.EQUAL) {
                 if (_filterinc == FilterIndeterminate.DISCARD) {
                     return _threshold >= lowerBound && _threshold <= upperBound;
