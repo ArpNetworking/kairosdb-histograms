@@ -171,20 +171,20 @@ public class HistogramFilterAggregator implements Aggregator {
         }
 
         public DataPoint next() {
-            final long timeStamp = currentDataPoint.getTimestamp();
+            final DataPoint dp = currentDataPoint;
+            moveCurrentDataPoint();
+            final long timeStamp = dp.getTimestamp();
             final TreeMap<Double, Integer> filtered = Maps.newTreeMap();
             double min = Double.MAX_VALUE;
             double max = -Double.MAX_VALUE;
             double sum = 0;
             long count = 0;
 
-            if (currentDataPoint instanceof HistogramDataPoint) {
-                final HistogramDataPoint hist = (HistogramDataPoint) currentDataPoint;
+            if (dp instanceof HistogramDataPoint) {
+                final HistogramDataPoint hist = (HistogramDataPoint) dp;
 
                 if (histNotChangedByThreshold(hist)) {
-                    final DataPoint ret = currentDataPoint;
-                    moveCurrentDataPoint();
-                    return ret;
+                    return dp;
                 } else {
                     for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
                         if (!shouldDiscard(entry.getKey())) {
@@ -213,7 +213,6 @@ public class HistogramFilterAggregator implements Aggregator {
             } else {
                 mean = sum / count;
             }
-            moveCurrentDataPoint();
             return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum);
         }
 
