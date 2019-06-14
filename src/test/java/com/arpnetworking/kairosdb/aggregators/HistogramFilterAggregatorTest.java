@@ -97,23 +97,37 @@ public class HistogramFilterAggregatorTest {
         return group;
     }
 
-    private HistogramDataPoint createHistogram(final long timeStamp, final Double... binValues) {
+    private HistogramDataPoint createHistogram(final long timeStamp, final Double... values) {
         double min = Double.MAX_VALUE;
         double max = -Double.MAX_VALUE;
         double sum = 0;
         double count = 0;
         final TreeMap<Double, Integer> bins = Maps.newTreeMap();
-
-        for (final Double binValue : binValues) {
-            final int binCount = binValue.intValue() + 10;
-            sum += binCount * binValue;
-            min = Math.min(min, binValue);
-            max = Math.max(max, binValue);
-            count += binCount;
-            bins.put(binValue, binCount);
+        for (final Double value : values) {
+            sum += HistogramFilterAggregator.truncate(value);
+            min = Math.min(min, Math.min(value, HistogramFilterAggregator.binInclusiveBound(value)));
+            max = Math.max(max, Math.max(value, HistogramFilterAggregator.binInclusiveBound(value)));
+            bins.compute(HistogramFilterAggregator.truncate(value), (i, j) -> j == null ? 1 : j + 1);
+            count++;
         }
         final double mean = sum / count;
+        return new HistogramDataPointImpl(timeStamp, 7, bins, min, max, mean, sum);
+    }
 
+    private HistogramDataPoint createExactHistogram(final long timeStamp, final Double... values) {
+        double min = Double.MAX_VALUE;
+        double max = -Double.MAX_VALUE;
+        double sum = 0;
+        double count = 0;
+        final TreeMap<Double, Integer> bins = Maps.newTreeMap();
+        for (final Double value : values) {
+            sum += HistogramFilterAggregator.truncate(value);
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+            bins.compute(HistogramFilterAggregator.truncate(value), (i, j) -> j == null ? 1 : j + 1);
+            count++;
+        }
+        final double mean = sum / count;
         return new HistogramDataPointImpl(timeStamp, 7, bins, min, max, mean, sum);
     }
 
@@ -121,27 +135,37 @@ public class HistogramFilterAggregatorTest {
                          final HistogramFilterAggregator.FilterIndeterminate ind,
                          final boolean isAtBoundaryTest, final boolean isPositiveTest,
                          final ListDataPointGroup expected) {
-        _aggregator.setFilterOp(op);
-        _aggregator.setFilterIndeterminateInclusion(ind);
         final ListDataPointGroup group;
+        final double threshold;
         if (isPositiveTest) {
             group = createGroup(createHistogram(1L, POS_99_5, POS_100_0, POS_100_5),
                     createHistogram(2L, POS_0_0, POS_512_0, POS_516_0));
             if (isAtBoundaryTest) {
-                _aggregator.setThreshold(POS_100_0);
+                threshold = POS_100_0;
             } else {
-                _aggregator.setThreshold(POS_100_01);
+                threshold = POS_100_01;
             }
         } else {
             group = createGroup(createHistogram(1L, NEG_99_5, NEG_100_0, NEG_100_5),
                     createHistogram(2L, NEG_0_0, NEG_512_0, NEG_516_0));
             if (isAtBoundaryTest) {
-                _aggregator.setThreshold(NEG_100_0);
+                threshold = NEG_100_0;
             } else {
-                _aggregator.setThreshold(NEG_100_01);
+                threshold = NEG_100_01;
             }
         }
-        final DataPointGroup results = _aggregator.aggregate(group);
+        runTest(op, ind, threshold, group, expected);
+    }
+
+    private void runTest(final FilterAggregator.FilterOperation op,
+                         final HistogramFilterAggregator.FilterIndeterminate ind,
+                         final double threshold,
+                         final ListDataPointGroup input,
+                         final ListDataPointGroup expected) {
+        _aggregator.setFilterOp(op);
+        _aggregator.setFilterIndeterminateInclusion(ind);
+        _aggregator.setThreshold(threshold);
+        final DataPointGroup results = _aggregator.aggregate(input);
         assertGroupsEqual(expected, results);
     }
 
@@ -279,6 +303,22 @@ public class HistogramFilterAggregatorTest {
     }
 
     @Test
+    public void testFilterLessThanHistogramNotChanged() {
+        runTest(FilterAggregator.FilterOperation.LT,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                NEG_512_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                        createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)));
+    }
+
+    @Test
+    public void testFilterLessThanMaxNotChanged() {
+        runTest(FilterAggregator.FilterOperation.LT,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                NEG_1EN310, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, POS_0_0, POS_100_01)));
+    }
+
+    @Test
     public void testFilterLessThanOrEqualKeepThresholdAtBinBoundaryPositiveBins() {
         runTest(FilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 true, true,
@@ -337,6 +377,22 @@ public class HistogramFilterAggregatorTest {
         runTest(FilterAggregator.FilterOperation.LTE, HistogramFilterAggregator.FilterIndeterminate.DISCARD,
                 false, false,
                 createGroup(createHistogram(1L, NEG_99_5), createHistogram(2L, NEG_0_0)));
+    }
+
+    @Test
+    public void testFilterLessThanOrEqualHistogramNotChanged() {
+        runTest(FilterAggregator.FilterOperation.LTE,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                NEG_512_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)));
+    }
+
+    @Test
+    public void testFilterLessThanOrEqualMaxNotChanged() {
+        runTest(FilterAggregator.FilterOperation.LTE,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                NEG_1EN310, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, POS_0_0, POS_100_01)));
     }
 
     @Test
@@ -402,6 +458,23 @@ public class HistogramFilterAggregatorTest {
     }
 
     @Test
+    public void testFilterGreaterThanHistogramNotChanged() {
+        runTest(FilterAggregator.FilterOperation.GTE,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                POS_512_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)));
+    }
+
+    @Test
+    public void testFilterGreaterThanMinNotChanged() {
+        runTest(FilterAggregator.FilterOperation.GTE,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                POS_1EN310, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01,
+                        HistogramFilterAggregator.binInclusiveBound(POS_0_0))));
+    }
+
+    @Test
     public void testFilterGreaterThanOrEqualKeepThresholdAtBinBoundaryPositiveBins() {
         runTest(FilterAggregator.FilterOperation.GTE, HistogramFilterAggregator.FilterIndeterminate.KEEP,
                 true, true,
@@ -460,6 +533,24 @@ public class HistogramFilterAggregatorTest {
                 false, false,
                 createGroup(createHistogram(1L, NEG_100_5),
                         createHistogram(2L, NEG_512_0, NEG_516_0)));
+    }
+
+    @Test
+    public void testFilterGreaterThanOrEqualHistogramNotChanged() {
+        runTest(FilterAggregator.FilterOperation.GTE,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                POS_512_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)));
+    }
+
+    @Test
+    public void testFilterGreaterThanOrEqualMinNotChanged() {
+        runTest(FilterAggregator.FilterOperation.GTE,
+                HistogramFilterAggregator.FilterIndeterminate.KEEP,
+                POS_1EN310,
+                createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01,
+                        HistogramFilterAggregator.binInclusiveBound(POS_0_0))));
     }
 
     @Test
@@ -526,4 +617,36 @@ public class HistogramFilterAggregatorTest {
                         createHistogram(2L, NEG_0_0, NEG_512_0, NEG_516_0)));
     }
 
+    @Test
+    public void testFilterEqualHistogramNotChangedTooHigh() {
+        runTest(FilterAggregator.FilterOperation.EQUAL,
+                HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                POS_512_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)));
+    }
+
+    @Test
+    public void testFilterEqualHistogramNotChangedTooLow() {
+        runTest(FilterAggregator.FilterOperation.EQUAL,
+                HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                NEG_512_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)));
+    }
+
+    @Test
+    public void testFilterEqualMinNotChanged() {
+        runTest(FilterAggregator.FilterOperation.EQUAL,
+                HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                POS_100_0, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, NEG_100_01,
+                        HistogramFilterAggregator.binInclusiveBound(POS_0_0))));
+    }
+
+    @Test
+    public void testFilterEqualMaxNotChanged() {
+        runTest(FilterAggregator.FilterOperation.EQUAL,
+                HistogramFilterAggregator.FilterIndeterminate.DISCARD,
+                NEG_100_01, createGroup(createExactHistogram(1L, NEG_100_01, POS_0_0, POS_100_01)),
+                createGroup(createExactHistogram(1L, POS_0_0, POS_100_01)));
+    }
 }
