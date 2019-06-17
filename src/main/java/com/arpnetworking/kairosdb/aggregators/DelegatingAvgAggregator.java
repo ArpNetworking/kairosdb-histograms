@@ -15,7 +15,7 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
 import org.kairosdb.core.annotation.FeatureComponent;
 
 import javax.inject.Inject;
@@ -29,14 +29,14 @@ import javax.inject.Named;
 @FeatureComponent(
         name = "avg",
         description = "Computes the mean value of the histograms.")
-public final class DelegatingAvgAggregator extends DelegatingAggregator {
+public final class DelegatingAvgAggregator extends DelegatingRangeAggregator {
     /**
      * Public constructor.
      *
      * @param aggregatorMap aggregators to use
      */
     @Inject
-    public DelegatingAvgAggregator(@Named("avg") final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingAvgAggregator(@Named("avg") final DelegatingRangeAggregatorMap aggregatorMap) {
         super(aggregatorMap);
     }
 }

@@ -15,11 +15,13 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
+import org.apache.commons.lang3.NotImplementedException;
+import org.joda.time.DateTimeZone;
 import org.kairosdb.core.DataPoint;
+import org.kairosdb.core.aggregator.RangeAggregator;
 import org.kairosdb.core.datapoints.DoubleDataPointFactoryImpl;
 import org.kairosdb.core.datastore.DataPointGroup;
-import org.kairosdb.plugin.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,17 +33,38 @@ import javax.inject.Provider;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class DelegatingAggregator implements Aggregator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingAggregator.class);
-    private final DelegatingAggregatorMap _aggregatorMap;
+public class DelegatingRangeAggregator extends RangeAggregator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingRangeAggregator.class);
+    private final DelegatingRangeAggregatorMap _aggregatorMap;
+    private boolean _sampleAlign;
+    private long _startTime;
+    private DateTimeZone _timeZone = DateTimeZone.UTC;
 
     /**
      * Public constructor.
      *
      * @param aggregatorMap aggregators to use
      */
-    public DelegatingAggregator(final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingRangeAggregator(final DelegatingRangeAggregatorMap aggregatorMap) {
         _aggregatorMap = aggregatorMap;
+    }
+
+    @Override
+    public void setAlignSampling(final boolean align) {
+        _sampleAlign = align;
+        super.setAlignSampling(align);
+    }
+
+    @Override
+    public void setStartTime(final long startTime) {
+        _startTime = startTime;
+        super.setStartTime(startTime);
+    }
+
+    @Override
+    public void setTimeZone(final DateTimeZone timeZone) {
+        _timeZone = timeZone;
+        super.setTimeZone(timeZone);
     }
 
     @Override
@@ -56,15 +79,20 @@ public class DelegatingAggregator implements Aggregator {
             dataType = DoubleDataPointFactoryImpl.DST_DOUBLE;
         }
 
-        final Optional<Aggregator> aggregatorOptional = _aggregatorMap.aggregatorForDataStoreDataType(dataType);
+        final Optional<RangeAggregator> aggregatorOptional = _aggregatorMap.aggregatorForDataStoreDataType(dataType);
         if (!aggregatorOptional.isPresent()) {
             throw new IllegalArgumentException("Cannot aggregate a " + dataType);
         }
 
-        final Aggregator aggregator = aggregatorOptional.get();
+        final RangeAggregator aggregator = aggregatorOptional.get();
         LOGGER.trace("Delegating to a " + aggregator.getClass().getSimpleName());
-        setProperties(aggregator);
+        aggregator.setAlignSampling(_sampleAlign);
+        aggregator.setStartTime(_startTime);
+        aggregator.setAlignStartTime(m_alignStartTime);
+        aggregator.setTimeZone(_timeZone);
+        aggregator.setSampling(m_sampling);
 
+        setProperties(aggregator);
         return aggregator.aggregate(wrapped);
     }
 
@@ -73,7 +101,13 @@ public class DelegatingAggregator implements Aggregator {
      *
      * @param aggregator the delegated aggregator
      */
-    protected void setProperties(final Aggregator aggregator) { }
+    protected void setProperties(final RangeAggregator aggregator) {
+    }
+
+    @Override
+    protected RangeSubAggregator getSubAggregator() {
+        throw new NotImplementedException("Delegating aggregators do not provide a subAggregator");
+    }
 
     @Override
     public boolean canAggregate(final String groupType) {
@@ -82,7 +116,7 @@ public class DelegatingAggregator implements Aggregator {
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        final Optional<Provider<? extends Aggregator>> provider = _aggregatorMap.aggregatorForGroupType(groupType);
+        final Optional<Provider<? extends RangeAggregator>> provider = _aggregatorMap.aggregatorForGroupType(groupType);
         if (provider.isPresent()) {
             return provider.get().get().getAggregatedGroupType(groupType);
         }

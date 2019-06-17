@@ -15,7 +15,7 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
 import com.google.inject.Inject;
 import org.kairosdb.core.annotation.FeatureComponent;
 
@@ -29,14 +29,14 @@ import javax.inject.Named;
 @FeatureComponent(
         name = "min",
         description = "Returns the minimum value data point for the time range.")
-public final class DelegatingMinAggregator extends DelegatingAggregator {
+public final class DelegatingMinAggregator extends DelegatingRangeAggregator {
     /**
      * Public constructor.
      *
      * @param aggregatorMap aggregators to use
      */
     @Inject
-    public DelegatingMinAggregator(@Named("min") final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingMinAggregator(@Named("min") final DelegatingRangeAggregatorMap aggregatorMap) {
         super(aggregatorMap);
     }
 }

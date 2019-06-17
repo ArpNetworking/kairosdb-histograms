@@ -15,7 +15,7 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
 import com.google.inject.Inject;
 import org.kairosdb.core.aggregator.PercentileAggregator;
 import org.kairosdb.core.aggregator.RangeAggregator;
@@ -34,7 +34,7 @@ import javax.inject.Named;
 @FeatureComponent(
         name = "percentile",
         description = "Finds the percentile of the data range.")
-public final class DelegatingPercentileAggregator extends DelegatingAggregator {
+public final class DelegatingPercentileAggregator extends DelegatingRangeAggregator {
     @javax.validation.constraints.Min(0)
     @javax.validation.constraints.Max(1)
     private double _percentile = -1d;
@@ -45,7 +45,7 @@ public final class DelegatingPercentileAggregator extends DelegatingAggregator {
      * @param aggregatorMap aggregators to use
      */
     @Inject
-    public DelegatingPercentileAggregator(@Named("percentile") final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingPercentileAggregator(@Named("percentile") final DelegatingRangeAggregatorMap aggregatorMap) {
         super(aggregatorMap);
     }
 

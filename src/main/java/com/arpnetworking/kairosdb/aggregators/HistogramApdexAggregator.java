@@ -58,7 +58,6 @@ public class HistogramApdexAggregator extends RangeAggregator{
      * Public constructor.
      *
      * @param dataPointFactory A factory for creating DoubleDataPoints
-     * @param dataPointFactory
      */
     @Inject
     public HistogramApdexAggregator(final DoubleDataPointFactory dataPointFactory) {

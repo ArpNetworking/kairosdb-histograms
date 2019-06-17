@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.arpnetworking.kairosdb.aggregators;
+package com.arpnetworking.kairosdb;
 
-import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
-import com.google.inject.Inject;
-import org.kairosdb.core.annotation.FeatureComponent;
+import org.kairosdb.core.KairosDataPointFactory;
+import org.kairosdb.core.aggregator.RangeAggregator;
 
-import javax.inject.Named;
+import java.util.List;
+import javax.inject.Provider;
 
 /**
- * Count aggregator that delegates to the built-in and the histogram aggregators.
+ * Provides mapping of data types and data groups to the aggregators that can aggregate them.
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-@FeatureComponent(
-        name = "count",
-        description = "Counts the number of data points.")
-public final class DelegatingCountAggregator extends DelegatingRangeAggregator {
+public class DelegatingRangeAggregatorMap extends GenericAggregatorMap<RangeAggregator> {
+
     /**
      * Public constructor.
      *
-     * @param aggregatorMap aggregators to use
+     * @param dataPointFactory Factory for creating data points.
+     * @param aggregators The aggregators to map to.
      */
-    @Inject
-    public DelegatingCountAggregator(@Named("count") final DelegatingRangeAggregatorMap aggregatorMap) {
-        super(aggregatorMap);
+    public DelegatingRangeAggregatorMap(
+            final KairosDataPointFactory dataPointFactory,
+            final List<Provider<? extends RangeAggregator>> aggregators) {
+        super(dataPointFactory, aggregators);
     }
 }

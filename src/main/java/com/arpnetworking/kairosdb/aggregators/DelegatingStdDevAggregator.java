@@ -15,7 +15,7 @@
  */
 package com.arpnetworking.kairosdb.aggregators;
 
-import com.arpnetworking.kairosdb.DelegatingAggregatorMap;
+import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
 import org.kairosdb.core.annotation.FeatureComponent;
 
 import javax.inject.Inject;
@@ -29,14 +29,14 @@ import javax.inject.Named;
 @FeatureComponent(
         name = "dev",
         description = "Computes the standard deviation value of the histograms.")
-public final class DelegatingStdDevAggregator extends DelegatingAggregator {
+public final class DelegatingStdDevAggregator extends DelegatingRangeAggregator {
     /**
      * Public constructor.
      *
      * @param aggregatorMap aggregators to use
      */
     @Inject
-    public DelegatingStdDevAggregator(@Named("dev") final DelegatingAggregatorMap aggregatorMap) {
+    public DelegatingStdDevAggregator(@Named("dev") final DelegatingRangeAggregatorMap aggregatorMap) {
         super(aggregatorMap);
     }
 }

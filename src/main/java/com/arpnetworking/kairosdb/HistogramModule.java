@@ -15,8 +15,10 @@
  */
 package com.arpnetworking.kairosdb;
 
+
 import com.arpnetworking.kairosdb.aggregators.DelegatingAvgAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingCountAggregator;
+import com.arpnetworking.kairosdb.aggregators.DelegatingFilterAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingMaxAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingMinAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingPercentileAggregator;
@@ -24,6 +26,7 @@ import com.arpnetworking.kairosdb.aggregators.DelegatingStdDevAggregator;
 import com.arpnetworking.kairosdb.aggregators.DelegatingSumAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramApdexAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramCountAggregator;
+import com.arpnetworking.kairosdb.aggregators.HistogramFilterAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMaxAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMeanAggregator;
 import com.arpnetworking.kairosdb.aggregators.HistogramMergeAggregator;
@@ -43,6 +46,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.kairosdb.core.KairosDataPointFactory;
 import org.kairosdb.core.aggregator.AvgAggregator;
 import org.kairosdb.core.aggregator.CountAggregator;
+import org.kairosdb.core.aggregator.FilterAggregator;
 import org.kairosdb.core.aggregator.MaxAggregator;
 import org.kairosdb.core.aggregator.MinAggregator;
 import org.kairosdb.core.aggregator.PercentileAggregator;
@@ -91,82 +95,96 @@ public class HistogramModule extends AbstractModule {
 
         bind(MovingWindowAggregator.class);
         bind(MovingWindowQueryPreProcessor.class);
+
+        bind(DelegatingFilterAggregator.class);
+        bind(HistogramFilterAggregator.class);
     }
 
     @Provides
     @Named("avg")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getAvgMap(
+    private DelegatingRangeAggregatorMap getAvgMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramMeanAggregator> histProvider,
             final Provider<AvgAggregator> avgProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, avgProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, avgProvider));
     }
 
     @Provides
     @Named("count")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getCountMap(
+    private DelegatingRangeAggregatorMap getCountMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramCountAggregator> histProvider,
             final Provider<CountAggregator> countProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, countProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, countProvider));
     }
 
     @Provides
     @Named("min")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getMinMap(
+    private DelegatingRangeAggregatorMap getMinMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramMinAggregator> histProvider,
             final Provider<MinAggregator> minProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, minProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, minProvider));
     }
 
     @Provides
     @Named("max")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getMaxMap(
+    private DelegatingRangeAggregatorMap getMaxMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramMaxAggregator> histProvider,
             final Provider<MaxAggregator> maxProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, maxProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, maxProvider));
     }
 
     @Provides
     @Named("sum")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getSumMap(
+    private DelegatingRangeAggregatorMap getSumMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramSumAggregator> histProvider,
             final Provider<SumAggregator> sumProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, sumProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, sumProvider));
     }
 
     @Provides
     @Named("percentile")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getPercentileMap(
+    private DelegatingRangeAggregatorMap getPercentileMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramPercentileAggregator> histProvider,
             final Provider<PercentileAggregator> percentileProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, percentileProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, percentileProvider));
     }
 
     @Provides
     @Named("dev")
     @Singleton
     @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
-    private DelegatingAggregatorMap getStdDevMap(
+    private DelegatingRangeAggregatorMap getStdDevMap(
             final KairosDataPointFactory factory,
             final Provider<HistogramStdDevAggregator> histProvider,
             final Provider<StdAggregator> stdDevProvider) {
-        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, stdDevProvider));
+        return new DelegatingRangeAggregatorMap(factory, Lists.newArrayList(histProvider, stdDevProvider));
+    }
+
+    @Provides
+    @Named("filter")
+    @Singleton
+    @SuppressFBWarnings(value = "UPM_UNCALLED_PRIVATE_METHOD", justification = "called reflectively by guice")
+    private DelegatingAggregatorMap getFilterMap(
+            final KairosDataPointFactory factory,
+            final Provider<HistogramFilterAggregator> histProvider,
+            final Provider<FilterAggregator> filterProvider) {
+        return new DelegatingAggregatorMap(factory, Lists.newArrayList(histProvider, filterProvider));
     }
 }

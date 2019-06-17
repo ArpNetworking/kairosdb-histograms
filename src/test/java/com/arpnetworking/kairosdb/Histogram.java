@@ -93,7 +93,6 @@ public class Histogram {
         } else {
             return false;
         }
-
     }
 
     @Override
