@@ -620,13 +620,7 @@ public class AggregationIT {
             final Map<String, ?> aggParams,
             final int expectedCode)
             throws JSONException, IOException {
-        final JSONObject params = new JSONObject(aggParams);
-        final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregator, params);
-        try (CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
-            final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
-            Assert.assertEquals("response: " + body, expectedCode, lookupResponse.getStatusLine().getStatusCode());
-            return body;
-        }
+        return queryWithExpectedCode(metricName, endTime, expectedCode, new AggregatorAndParams(aggregator, aggParams));
     }
 
     private String queryWithExpectedCode(
