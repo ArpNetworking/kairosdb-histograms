@@ -37,6 +37,7 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
     private final double _max;
     private final double _mean;
     private final double _sum;
+    private final int _originalCount;
 
     /**
      * Public constructor.
@@ -64,7 +65,42 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
         _max = max;
         _mean = mean;
         _sum = sum;
+        _originalCount = getSampleCount();
     }
+
+
+    /**
+     * Public constructor.
+     *
+     * @param timestamp the timestamp.
+     * @param precision bucket precision, in bits
+     * @param map the bins with values
+     * @param min the minimum value in the histogram
+     * @param max the maximum value in the histogram
+     * @param mean the mean value in the histogram
+     * @param sum the sum of all the values in the histogram
+     * @param originalCount the original number of data points that this histogram represented
+     */
+    // CHECKSTYLE.OFF: ParameterNumber
+    public HistogramDataPointImpl(
+            final long timestamp,
+            final int precision,
+            final TreeMap<Double, Integer> map,
+            final double min,
+            final double max,
+            final double mean,
+            final double sum,
+            final int originalCount) {
+        super(timestamp);
+        _precision = precision;
+        _map = map;
+        _min = min;
+        _max = max;
+        _mean = mean;
+        _sum = sum;
+        _originalCount = originalCount;
+    }
+    // CHECKSTYLE.ON: ParameterNumber
 
     @Override
     public void writeValueToBuffer(final DataOutput buffer) throws IOException {
@@ -122,6 +158,11 @@ public class HistogramDataPointImpl extends DataPointHelper implements Histogram
     @Override
     public double getDoubleValue() {
         return 0;
+    }
+
+    @Override
+    public int getOriginalCount() {
+        return _originalCount;
     }
 
     /**

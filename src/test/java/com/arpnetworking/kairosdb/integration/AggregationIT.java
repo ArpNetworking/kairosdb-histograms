@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
+import org.kairosdb.testing.AggregatorAndParams;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -274,6 +275,77 @@ public class AggregationIT {
         testDoubleAggregate("filter", input, expected, filterParam("lt", 5d));
     }
 
+    // **** percent remaining aggregator ***
+    @Test
+    public void testPercentRemainingAggregatorSolo() throws IOException, JSONException {
+        testAggregate("percent_remaining", SINGLE_HIST_TEST_DATA, 1d, Collections.emptyMap());
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorMulti() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Lists.newArrayList(0.166666, 0.666666),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 10d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorFilterAll() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Lists.newArrayList(0d, 0d),
+                new AggregatorAndParams("filter", filterParam("gt", "keep", 0d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorFilterNone() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Lists.newArrayList(1d, 1d),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 0d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorMergeAll() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Collections.singletonList(1d),
+                new AggregatorAndParams("merge", samplingParam()),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorMergeSome() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Arrays.asList(1d, 1d),
+                new AggregatorAndParams("merge", Collections.emptyMap()),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorFilterThenMerge() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Collections.singletonList(0.666666),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 5d)),
+                new AggregatorAndParams("merge", samplingParam()),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
+    @Test
+    public void testPercentRemainingAggregatorMergeThenFilter() throws IOException, JSONException {
+        testAggregateToDoubles(
+                MULTI_HIST_TEST_DATA, Collections.singletonList(0.666666),
+                new AggregatorAndParams("merge", samplingParam()),
+                new AggregatorAndParams("filter", filterParam("lt", "keep", 5d)),
+                new AggregatorAndParams("percent_remaining", Collections.emptyMap())
+        );
+    }
+
     private Map<String, Object> samplingParam() {
         final Map<String, Object> sampling = Maps.newHashMap();
         sampling.put("value", 10);
@@ -418,6 +490,27 @@ public class AggregationIT {
         verifyQueryResponse(histograms.size(), expected, body);
     }
 
+    private void testAggregateToDoubles(
+            final List<Histogram> histograms,
+            final List<Double> expected,
+            final AggregatorAndParams... aggregators)
+            throws JSONException, IOException {
+        if (aggregators.length < 1) {
+            throw new IllegalArgumentException("Must specify at least one aggregator");
+        }
+
+        final String metricName = newMetricName(aggregators[aggregators.length - 1].getAggregator());
+
+        int i = 1;
+        for (final Histogram histogram : histograms) {
+            postHistogramWithExpectedCode(metricName, i++, histogram, 204);
+        }
+
+        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), 200,
+                aggregators);
+        verifyQueryResponseDouble(histograms.size(), expected, body);
+    }
+
     private void verifyQueryResponse(
             final int expectedSamples,
             final double expectedResult,
@@ -484,7 +577,7 @@ public class AggregationIT {
             Assert.assertEquals(i + 1, jsonPair.getInt(0));
             final Double actual = jsonPair.getDouble(1);
 
-            Assert.assertEquals(expectedResult.get(i), actual);
+            Assert.assertEquals(expectedResult.get(i), actual, 0.000001);
         }
     }
 
@@ -527,8 +620,16 @@ public class AggregationIT {
             final Map<String, ?> aggParams,
             final int expectedCode)
             throws JSONException, IOException {
-        final JSONObject params = new JSONObject(aggParams);
-        final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregator, params);
+        return queryWithExpectedCode(metricName, endTime, expectedCode, new AggregatorAndParams(aggregator, aggParams));
+    }
+
+    private String queryWithExpectedCode(
+            final String metricName,
+            final long endTime,
+            final int expectedCode,
+            final AggregatorAndParams... aggregators)
+            throws JSONException, IOException {
+        final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregators);
         try (CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
             final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
             Assert.assertEquals("response: " + body, expectedCode, lookupResponse.getStatusLine().getStatusCode());

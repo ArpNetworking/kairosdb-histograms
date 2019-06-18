@@ -178,9 +178,11 @@ public class HistogramFilterAggregator implements Aggregator {
             double max = -Double.MAX_VALUE;
             double sum = 0;
             long count = 0;
+            int originalCount = 0;
 
             if (dp instanceof HistogramDataPoint) {
                 final HistogramDataPoint hist = (HistogramDataPoint) dp;
+                originalCount = hist.getOriginalCount();
 
                 if (histNotChangedByThreshold(hist)) {
                     return dp;
@@ -212,7 +214,7 @@ public class HistogramFilterAggregator implements Aggregator {
             } else {
                 mean = sum / count;
             }
-            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum);
+            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum, originalCount);
         }
 
         private DataPoint moveCurrentDataPoint() {

@@ -70,6 +70,7 @@ public final class HistogramMergeAggregator extends RangeAggregator {
             double max = -Double.MAX_VALUE;
             double sum = 0;
             long count = 0;
+            int originalCount = 0;
 
             while (dataPointRange.hasNext()) {
                 final DataPoint dp = dataPointRange.next();
@@ -80,6 +81,8 @@ public final class HistogramMergeAggregator extends RangeAggregator {
                         count += entry.getValue();
                     }
 
+                    originalCount += hist.getOriginalCount();
+
                     min = Math.min(min, hist.getMin());
                     max = Math.max(max, hist.getMax());
                     sum += hist.getSum();
@@ -88,7 +91,7 @@ public final class HistogramMergeAggregator extends RangeAggregator {
 
             final double mean = sum / count;
 
-            return Collections.singletonList(new HistogramDataPointImpl(returnTime, 7, merged, min, max, mean, sum));
+            return Collections.singletonList(new HistogramDataPointImpl(returnTime, 7, merged, min, max, mean, sum, originalCount));
         }
     }
 }
