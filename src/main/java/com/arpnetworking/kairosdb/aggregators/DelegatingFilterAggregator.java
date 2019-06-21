@@ -33,10 +33,10 @@ import javax.inject.Named;
         description = "Filters datapoints according to filter operation with a null data point.")
 public class DelegatingFilterAggregator extends DelegatingAggregator {
     private FilterAggregator.FilterOperation _filterop
-            = FilterAggregator.FilterOperation.LT;
+            = FilterAggregator.FilterOperation.EQUAL;
     private HistogramFilterAggregator.FilterIndeterminate _filterinc
             = HistogramFilterAggregator.FilterIndeterminate.KEEP;
-    private double _threshold;
+    private double _threshold = 0.0;
 
     /**
      * Setter for filter operation.
