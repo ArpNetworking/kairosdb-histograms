@@ -260,6 +260,13 @@ public class AggregationIT {
     }
 
     @Test
+    public void testFilterAggregatorMissingIndeterminateField() throws IOException, JSONException {
+        final List<Histogram> expected = Lists.newArrayList(
+                new Histogram(Arrays.asList(5d, 7d, 9d, 9d, 9d)));
+        testAggregate("filter", SINGLE_HIST_TEST_DATA, expected, filterParam("lt", 5d));
+    }
+
+    @Test
     public void testFilterAroundZero() throws IOException, JSONException {
         final List<Histogram> input = Lists.newArrayList(new Histogram(Arrays.asList(100d, 0d, -0d, -110d)));
         final List<Histogram> expectedPositiveBins = Lists.newArrayList(new Histogram(Arrays.asList(100d, 0d)));

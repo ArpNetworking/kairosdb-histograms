@@ -75,7 +75,7 @@ public class HistogramFilterAggregator implements Aggregator {
             description = "The operation performed for each data point.",
             type = "enum",
             options = {"lte", "lt", "gte", "gt", "equal"},
-            default_value = "lt"
+            default_value = "equal"
     )
     private FilterAggregator.FilterOperation _filterop;
 
@@ -103,7 +103,7 @@ public class HistogramFilterAggregator implements Aggregator {
     @Inject
     public HistogramFilterAggregator() {
         _threshold = 0.0;
-        _filterop = FilterAggregator.FilterOperation.LT;
+        _filterop = FilterAggregator.FilterOperation.EQUAL;
         _filterinc = FilterIndeterminate.KEEP;
     }
 
