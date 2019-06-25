@@ -276,6 +276,13 @@ public class AggregationIT {
     }
 
     @Test
+    public void testFilterAll() throws IOException, JSONException {
+        final List<Histogram> expected = Lists.newArrayList(
+                new Histogram(Collections.emptyList()));
+        testAggregate("filter", SINGLE_HIST_TEST_DATA, expected, filterParam("gt", 0));
+    }
+
+    @Test
     public void testDefaultFilterAggregator() throws IOException, JSONException {
         final List<Double> input = Arrays.asList(9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d);
         final List<Double> expected = Arrays.asList(9d, 8d, 7d, 6d, 5d);
