@@ -276,10 +276,23 @@ public class AggregationIT {
     }
 
     @Test
+    public void testFilterAll() throws IOException, JSONException {
+        testAggregate("filter", SINGLE_HIST_TEST_DATA, Collections.emptyList(),
+                filterParam("gt", 0));
+    }
+
+    @Test
     public void testDefaultFilterAggregator() throws IOException, JSONException {
         final List<Double> input = Arrays.asList(9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d);
         final List<Double> expected = Arrays.asList(9d, 8d, 7d, 6d, 5d);
         testDoubleAggregate("filter", input, expected, filterParam("lt", 5d));
+    }
+
+    @Test
+    public void testDefaultFilterAggregatorWithIndeterminateField() throws IOException, JSONException {
+        final List<Double> input = Arrays.asList(9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d);
+        final List<Double> expected = Arrays.asList(9d, 8d, 7d, 6d, 5d);
+        testDoubleAggregate("filter", input, expected, filterParam("lt", "keep", 5d));
     }
 
     // **** percent remaining aggregator ***
@@ -300,7 +313,7 @@ public class AggregationIT {
     @Test
     public void testPercentRemainingAggregatorFilterAll() throws IOException, JSONException {
         testAggregateToDoubles(
-                MULTI_HIST_TEST_DATA, Lists.newArrayList(0d, 0d),
+                MULTI_HIST_TEST_DATA, Collections.emptyList(),
                 new AggregatorAndParams("filter", filterParam("gt", "keep", 0d)),
                 new AggregatorAndParams("percent_remaining", Collections.emptyMap())
         );
@@ -476,7 +489,8 @@ public class AggregationIT {
             postHistogramWithExpectedCode(metricName, i++, histogram, 204);
         }
 
-        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), aggregator, aggParams, 200);
+        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), aggregator,
+                aggParams, 200);
         verifyQueryResponse(histograms.size(), expected, body);
     }
 
@@ -493,7 +507,8 @@ public class AggregationIT {
             postHistogramWithExpectedCode(metricName, i++, histogram, 204);
         }
 
-        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), aggregator, aggParams, 200);
+        final String body = queryWithExpectedCode(metricName, 1000 + histograms.size(), aggregator,
+                aggParams, 200);
         verifyQueryResponse(histograms.size(), expected, body);
     }
 
@@ -578,12 +593,11 @@ public class AggregationIT {
         final JSONArray result = queryObject.getJSONArray("results")
                 .getJSONObject(0).getJSONArray("values");
 
-        Assert.assertEquals(result.length(), expectedResult.size());
+        Assert.assertEquals(expectedResult.size(), result.length());
         for (int i = 0; i < result.length(); i++) {
             final JSONArray jsonPair = result.getJSONArray(i);
             Assert.assertEquals(i + 1, jsonPair.getInt(0));
-            final Double actual = jsonPair.getDouble(1);
-
+            final double actual = jsonPair.getDouble(1);
             Assert.assertEquals(expectedResult.get(i), actual, 0.000001);
         }
     }
