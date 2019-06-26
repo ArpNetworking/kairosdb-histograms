@@ -76,7 +76,7 @@ public class HistogramPercentRemainingAggregatorTest {
 
     @Test
     public void testPercentRemainingEmptyGroup() {
-        runPercentRemainingTest(EMPTY_HIST_GROUP, createDoubleGroup(-1d), _filterAggregator);
+        runPercentRemainingTest(EMPTY_HIST_GROUP, createDoubleGroup(-1));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -90,7 +90,7 @@ public class HistogramPercentRemainingAggregatorTest {
     @Test
     public void testPercentRemainingFilterAllOut() {
         configureFilter(FilterAggregator.FilterOperation.GT, 0d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0d), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(), _filterAggregator);
     }
 
     @Test

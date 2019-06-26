@@ -67,8 +67,8 @@ public class HistogramFilterAggregatorTest {
             Assert.assertTrue("Actual group is missing data points", actual.hasNext());
             final DataPoint act = actual.next();
             final DataPoint exp = expected.next();
-            Assert.assertEquals("Expected and actual timestamps do not match", act.getTimestamp(),
-                    exp.getTimestamp());
+            Assert.assertEquals("Expected and actual timestamps do not match", exp.getTimestamp(),
+                    act.getTimestamp());
             assertHistogramsEqual(exp, act);
         }
         Assert.assertFalse("Actual group has too many data points", actual.hasNext());
@@ -193,12 +193,7 @@ public class HistogramFilterAggregatorTest {
                 new DoubleDataPoint(2L, 100.0)
         );
 
-        final ListDataPointGroup expected = createGroup(
-                new HistogramDataPointImpl(1L, 7, new TreeMap<>(),
-                        Double.NaN, Double.NaN, Double.NaN, Double.NaN),
-                new HistogramDataPointImpl(2L, 7, new TreeMap<>(),
-                        Double.NaN, Double.NaN, Double.NaN, Double.NaN)
-        );
+        final ListDataPointGroup expected = createGroup();
 
         final DataPointGroup results = _aggregator.aggregate(group);
         assertGroupsEqual(expected, results);
@@ -206,16 +201,14 @@ public class HistogramFilterAggregatorTest {
 
     @Test
     public void testFilterRemoveAllBins() {
-        final ListDataPointGroup group = createGroup(createHistogram(1L, POS_100_0, POS_512_0, POS_516_0));
+        final ListDataPointGroup group = createGroup(createHistogram(1L, POS_100_0, POS_512_0, POS_516_0),
+                createHistogram(2L, POS_100_0, POS_512_0, POS_516_0));
 
         _aggregator.setFilterOp(FilterAggregator.FilterOperation.GTE);
         _aggregator.setFilterIndeterminateInclusion(HistogramFilterAggregator.FilterIndeterminate.KEEP);
         _aggregator.setThreshold(POS_0_0);
 
-        final ListDataPointGroup expected = createGroup(
-                new HistogramDataPointImpl(1L, 7, new TreeMap<>(),
-                        Double.NaN, Double.NaN, Double.NaN, Double.NaN)
-        );
+        final ListDataPointGroup expected = createGroup();
         final DataPointGroup results = _aggregator.aggregate(group);
         assertGroupsEqual(expected, results);
     }

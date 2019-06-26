@@ -29,6 +29,7 @@ import org.kairosdb.core.datastore.DataPointGroup;
 import org.kairosdb.plugin.Aggregator;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 /**
@@ -167,11 +168,39 @@ public class HistogramFilterAggregator implements Aggregator {
         }
 
         public boolean hasNext() {
-            return currentDataPoint != null;
+            boolean foundValidDp = false;
+
+            while (!foundValidDp && currentDataPoint != null) {
+                final HistogramDataPoint hdp = filterBins(currentDataPoint);
+                if (hdp.getSampleCount() > 0) {
+                    currentDataPoint = hdp;
+                    foundValidDp = true;
+                } else {
+                    moveCurrentDataPoint();
+                }
+            }
+
+            return foundValidDp;
         }
 
         public DataPoint next() {
-            final DataPoint dp = moveCurrentDataPoint();
+            if (!hasNext()) {
+                throw new NoSuchElementException("No more data points exist");
+            }
+            final DataPoint ret = currentDataPoint;
+            moveCurrentDataPoint();
+            return ret;
+        }
+
+        private void moveCurrentDataPoint() {
+            if (hasNextInternal()) {
+                currentDataPoint = nextInternal();
+            } else {
+                currentDataPoint = null;
+            }
+        }
+
+        private HistogramDataPoint filterBins(final DataPoint dp) {
             final long timeStamp = dp.getTimestamp();
             final TreeMap<Double, Integer> filtered = Maps.newTreeMap();
             double min = Double.MAX_VALUE;
@@ -185,7 +214,7 @@ public class HistogramFilterAggregator implements Aggregator {
                 originalCount = hist.getOriginalCount();
 
                 if (histNotChangedByThreshold(hist)) {
-                    return dp;
+                    return hist;
                 } else {
                     for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
                         if (!shouldDiscard(entry.getKey())) {
@@ -204,27 +233,8 @@ public class HistogramFilterAggregator implements Aggregator {
                     }
                 }
             }
-            final double mean;
-            if (count == 0) {
-                // No bins exist or all bins have count of zero
-                min = Double.NaN;
-                max = Double.NaN;
-                sum = Double.NaN;
-                mean = Double.NaN;
-            } else {
-                mean = sum / count;
-            }
-            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max, mean, sum, originalCount);
-        }
-
-        private DataPoint moveCurrentDataPoint() {
-            final DataPoint dp = currentDataPoint;
-            if (hasNextInternal()) {
-                currentDataPoint = nextInternal();
-            } else {
-                currentDataPoint = null;
-            }
-            return dp;
+            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max,
+                    sum / count, sum, originalCount);
         }
 
         private boolean histNotChangedByThreshold(final HistogramDataPoint hist) {
