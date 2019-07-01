@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ import java.util.Iterator;
         name = "havg",
         description = "Computes the mean value of the histograms.")
 public final class HistogramMeanAggregator extends RangeAggregator {
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
 
     /**
      * Public constructor.
@@ -46,7 +46,7 @@ public final class HistogramMeanAggregator extends RangeAggregator {
      */
     @Inject
     public HistogramMeanAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class HistogramMeanAggregator extends RangeAggregator {
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return _dataPointFactory.getGroupType();
+        return dataPointFactory.getGroupType();
     }
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
@@ -78,7 +78,7 @@ public final class HistogramMeanAggregator extends RangeAggregator {
                 }
             }
 
-            return Collections.singletonList(_dataPointFactory.createDataPoint(returnTime, sum / count));
+            return Collections.singletonList(dataPointFactory.createDataPoint(returnTime, sum / count));
         }
     }
 }

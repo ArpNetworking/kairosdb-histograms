@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,13 +37,11 @@ import java.util.List;
 /**
  * Unit tests for the Histogram Percent Remaining Aggregator.
  *
+ * TODO(ville): Convert to parameterized testing using JUnit @Parameters.
+ *
  * @author Joey Jackson (jjackson at dropbox dot com)
  */
-public class HistogramPercentRemainingAggregatorTest {
-
-    private HistogramPercentRemainingAggregator _percentRemainingAggregator;
-    private HistogramFilterAggregator _filterAggregator;
-    private HistogramMergeAggregator _mergeAggregator;
+public final class HistogramPercentRemainingAggregatorTest {
 
     private static final List<DataPoint> SINGLE_HIST_GROUP =
             Collections.singletonList(HistogramUtils.createHistogram(1L, 1d, 10d, 100d, 1000d));
@@ -57,21 +55,25 @@ public class HistogramPercentRemainingAggregatorTest {
                     HistogramUtils.createHistogram(3L, 30d, 40d, 50d, 60d)
     );
 
+    private HistogramPercentRemainingAggregator percentRemainingAggregator;
+    private HistogramFilterAggregator filterAggregator;
+    private HistogramMergeAggregator mergeAggregator;
+
     @Before
     public void setUp() throws KairosDBException {
-        _percentRemainingAggregator = new HistogramPercentRemainingAggregator(new DoubleDataPointFactoryImpl());
+        percentRemainingAggregator = new HistogramPercentRemainingAggregator(new DoubleDataPointFactoryImpl());
 
-        _filterAggregator = new HistogramFilterAggregator();
-        _filterAggregator.setFilterIndeterminateInclusion(HistogramFilterAggregator.FilterIndeterminate.DISCARD);
+        filterAggregator = new HistogramFilterAggregator();
+        filterAggregator.setFilterIndeterminateInclusion(HistogramFilterAggregator.FilterIndeterminate.DISCARD);
 
-        _mergeAggregator = new HistogramMergeAggregator();
-        _mergeAggregator.setStartTime(1L);
-        _mergeAggregator.setSampling(new Sampling(10, TimeUnit.MINUTES));
+        mergeAggregator = new HistogramMergeAggregator();
+        mergeAggregator.setStartTime(1L);
+        mergeAggregator.setSampling(new Sampling(10, TimeUnit.MINUTES));
     }
 
     @Test(expected = NullPointerException.class)
     public void testPercentRemainingNull() {
-        _percentRemainingAggregator.aggregate(null);
+        percentRemainingAggregator.aggregate(null);
     }
 
     @Test
@@ -81,7 +83,7 @@ public class HistogramPercentRemainingAggregatorTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testPercentRemainingNotHistograms() {
-        final DataPointGroup percentRemainingGroup = _percentRemainingAggregator.aggregate(
+        final DataPointGroup percentRemainingGroup = percentRemainingAggregator.aggregate(
                 HistogramUtils.createGroup(SINGLE_DOUBLE_GROUP));
         Assert.assertTrue(percentRemainingGroup.hasNext());
         percentRemainingGroup.next();
@@ -90,60 +92,60 @@ public class HistogramPercentRemainingAggregatorTest {
     @Test
     public void testPercentRemainingFilterAllOut() {
         configureFilter(FilterAggregator.FilterOperation.GT, 0d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterNoneOut() {
         configureFilter(FilterAggregator.FilterOperation.GT, 10000d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(1d), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(1d), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterLT() {
         configureFilter(FilterAggregator.FilterOperation.LT, 5d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.75), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.75), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterLTE() {
         configureFilter(FilterAggregator.FilterOperation.LTE, 10d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.5), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.5), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterGT() {
         configureFilter(FilterAggregator.FilterOperation.GT, 5d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.25), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.25), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterGTE() {
         configureFilter(FilterAggregator.FilterOperation.GTE, 100d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.5), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.5), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterEqual() {
         configureFilter(FilterAggregator.FilterOperation.EQUAL, 100d);
-        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.75), _filterAggregator);
+        runPercentRemainingTest(SINGLE_HIST_GROUP, createDoubleGroup(0.75), filterAggregator);
     }
 
     @Test
     public void testPercentRemainingMerge() {
-        runPercentRemainingTest(MULTI_HIST_GROUP, createDoubleGroup(1d), _mergeAggregator);
+        runPercentRemainingTest(MULTI_HIST_GROUP, createDoubleGroup(1d), mergeAggregator);
     }
 
     @Test
     public void testPercentRemainingMergeThenFilter() {
         configureFilter(FilterAggregator.FilterOperation.LTE, 30d);
-        runPercentRemainingTest(MULTI_HIST_GROUP, createDoubleGroup(0.5), _mergeAggregator, _filterAggregator);
+        runPercentRemainingTest(MULTI_HIST_GROUP, createDoubleGroup(0.5), mergeAggregator, filterAggregator);
     }
 
     @Test
     public void testPercentRemainingFilterThenMerge() {
         configureFilter(FilterAggregator.FilterOperation.LTE, 30d);
-        runPercentRemainingTest(MULTI_HIST_GROUP, createDoubleGroup(0.5), _filterAggregator, _mergeAggregator);
+        runPercentRemainingTest(MULTI_HIST_GROUP, createDoubleGroup(0.5), filterAggregator, mergeAggregator);
 
     }
 
@@ -155,7 +157,7 @@ public class HistogramPercentRemainingAggregatorTest {
             aggregated = agg.aggregate(aggregated);
         }
 
-        final DataPointGroup percentRemainingGroup = _percentRemainingAggregator.aggregate(aggregated);
+        final DataPointGroup percentRemainingGroup = percentRemainingAggregator.aggregate(aggregated);
 
         while (expected.hasNext()) {
             Assert.assertTrue(percentRemainingGroup.hasNext());
@@ -175,7 +177,7 @@ public class HistogramPercentRemainingAggregatorTest {
     }
 
     private void configureFilter(final FilterAggregator.FilterOperation op, final double threshold) {
-        _filterAggregator.setThreshold(threshold);
-        _filterAggregator.setFilterOp(op);
+        filterAggregator.setThreshold(threshold);
+        filterAggregator.setFilterOp(op);
     }
 }

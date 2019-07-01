@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,14 +45,15 @@ import java.util.UUID;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class AggregationIT {
+public final class AggregationIT {
     private static final List<Histogram> SINGLE_HIST_TEST_DATA = Lists.newArrayList(
             new Histogram(Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d)));
     private static final List<Double> DOUBLE_TEST_DATA = Arrays.asList(1d, 3d, 5d, 7d, 9d, 1d, 9d, 1d, 9d);
     private static final List<Histogram> MULTI_HIST_TEST_DATA = Lists.newArrayList(
             new Histogram(Arrays.asList(9d, 1d, 9d, 1d, 8d, 12d)),
             new Histogram(Arrays.asList(18d, 2d, 18d, 2d, 20d, 20d)));
-    private final CloseableHttpClient _client = HttpClients.createDefault();
+
+    private final CloseableHttpClient client = HttpClients.createDefault();
 
     // ****  avg aggregator ***
     @Test
@@ -608,7 +609,7 @@ public class AggregationIT {
             final Double number,
             final int expectedCode) throws JSONException, IOException {
         final HttpPost post = KairosHelper.postNumber(timestamp, number, metricName);
-        try (CloseableHttpResponse response = _client.execute(post)) {
+        try (CloseableHttpResponse response = client.execute(post)) {
             final String body;
             if (response.getEntity() != null) {
                 body = CharStreams.toString(new InputStreamReader(response.getEntity().getContent(), Charsets.UTF_8));
@@ -625,7 +626,7 @@ public class AggregationIT {
             final Histogram histogram,
             final int expectedCode) throws JSONException, IOException {
         final HttpPost post = KairosHelper.postHistogram(timestamp, histogram, metricName);
-        try (CloseableHttpResponse response = _client.execute(post)) {
+        try (CloseableHttpResponse response = client.execute(post)) {
             Assert.assertEquals(expectedCode, response.getStatusLine().getStatusCode());
         }
     }
@@ -651,7 +652,7 @@ public class AggregationIT {
             final AggregatorAndParams... aggregators)
             throws JSONException, IOException {
         final HttpPost queryRequest = KairosHelper.queryFor(1, endTime, metricName, aggregators);
-        try (CloseableHttpResponse lookupResponse = _client.execute(queryRequest)) {
+        try (CloseableHttpResponse lookupResponse = client.execute(queryRequest)) {
             final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));
             Assert.assertEquals("response: " + body, expectedCode, lookupResponse.getStatusLine().getStatusCode());
             return body;

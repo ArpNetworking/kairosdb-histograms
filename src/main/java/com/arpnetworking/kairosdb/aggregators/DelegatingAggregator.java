@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,7 @@ import javax.inject.Provider;
  */
 public class DelegatingAggregator implements Aggregator {
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingAggregator.class);
-    private final DelegatingAggregatorMap _aggregatorMap;
+    private final DelegatingAggregatorMap aggregatorMap;
 
     /**
      * Public constructor.
@@ -41,7 +41,7 @@ public class DelegatingAggregator implements Aggregator {
      * @param aggregatorMap aggregators to use
      */
     public DelegatingAggregator(final DelegatingAggregatorMap aggregatorMap) {
-        _aggregatorMap = aggregatorMap;
+        this.aggregatorMap = aggregatorMap;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class DelegatingAggregator implements Aggregator {
             dataType = DoubleDataPointFactoryImpl.DST_DOUBLE;
         }
 
-        final Optional<Aggregator> aggregatorOptional = _aggregatorMap.aggregatorForDataStoreDataType(dataType);
+        final Optional<Aggregator> aggregatorOptional = aggregatorMap.aggregatorForDataStoreDataType(dataType);
         if (!aggregatorOptional.isPresent()) {
             throw new IllegalArgumentException("Cannot aggregate a " + dataType);
         }
@@ -77,12 +77,12 @@ public class DelegatingAggregator implements Aggregator {
 
     @Override
     public boolean canAggregate(final String groupType) {
-        return _aggregatorMap.aggregatorForGroupType(groupType).isPresent();
+        return aggregatorMap.aggregatorForGroupType(groupType).isPresent();
     }
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        final Optional<Provider<? extends Aggregator>> provider = _aggregatorMap.aggregatorForGroupType(groupType);
+        final Optional<Provider<? extends Aggregator>> provider = aggregatorMap.aggregatorForGroupType(groupType);
         if (provider.isPresent()) {
             return provider.get().get().getAggregatedGroupType(groupType);
         }

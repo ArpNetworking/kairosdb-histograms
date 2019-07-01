@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ import java.util.Iterator;
         name = "hmin",
         description = "Returns the minimum value data point for the time range.")
 public final class HistogramMinAggregator extends RangeAggregator {
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
 
     /**
      * Public constructor.
@@ -46,7 +46,7 @@ public final class HistogramMinAggregator extends RangeAggregator {
      */
     @Inject
     public HistogramMinAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class HistogramMinAggregator extends RangeAggregator {
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return _dataPointFactory.getGroupType();
+        return dataPointFactory.getGroupType();
     }
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
@@ -76,7 +76,7 @@ public final class HistogramMinAggregator extends RangeAggregator {
                 }
             }
 
-            return Collections.singletonList(_dataPointFactory.createDataPoint(returnTime, min));
+            return Collections.singletonList(dataPointFactory.createDataPoint(returnTime, min));
         }
     }
 }

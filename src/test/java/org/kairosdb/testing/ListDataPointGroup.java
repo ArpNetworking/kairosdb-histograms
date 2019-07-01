@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2016 KairosDB Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,16 +28,16 @@ import java.util.List;
 
 /**
  * DataPoint group for a list of datapoints for use in tests.
- * 
+ *
  * @author KairosDB Authors
  */
 public class ListDataPointGroup extends AbstractDataPointGroup {
-    private List<DataPoint> _dataPoints = new ArrayList<DataPoint>();
-    private Iterator<DataPoint> _iterator;
+    private List<DataPoint> dataPoints = new ArrayList<>();
+    private Iterator<DataPoint> iterator;
 
     /**
      * Constructor that delagates name to AbstractDataPointGroup.
-     * 
+     *
      * @param name Name of data point group
      */
     public ListDataPointGroup(final String name) {
@@ -50,41 +50,41 @@ public class ListDataPointGroup extends AbstractDataPointGroup {
 
     /**
      * Adds a datapoint to this datapoint group.
-     * 
+     *
      * @param dataPoint DataPoint to add
      */
     public void addDataPoint(final DataPoint dataPoint) {
-        _dataPoints.add(dataPoint);
+        dataPoints.add(dataPoint);
     }
 
     @Override
     public boolean hasNext() {
-        if (_iterator == null) {
-            _iterator = _dataPoints.iterator();
+        if (iterator == null) {
+            iterator = dataPoints.iterator();
         }
 
-        return _iterator.hasNext();
+        return iterator.hasNext();
     }
 
     @Override
     public DataPoint next() {
-        if (_iterator == null) {
-            _iterator = _dataPoints.iterator();
+        if (iterator == null) {
+            iterator = dataPoints.iterator();
         }
 
-        return _iterator.next();
+        return iterator.next();
     }
 
     /**
      * In-place sort of the datapoints in this datapoint group by value.
-     * 
+     *
      * @param order Order in witch to sort the datapoints
      */
     public void sort(final Order order) {
         if (order == Order.ASC) {
-            Collections.sort(_dataPoints, new DataPointComparator());
+            Collections.sort(dataPoints, new DataPointComparator());
         } else {
-            Collections.sort(_dataPoints, Collections.reverseOrder(new DataPointComparator()));
+            Collections.sort(dataPoints, Collections.reverseOrder(new DataPointComparator()));
         }
 
     }

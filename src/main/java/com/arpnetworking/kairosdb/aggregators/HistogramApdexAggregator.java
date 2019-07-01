@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ import javax.validation.constraints.NotNull;
         description = "Computes the Apdex score."
 )
 public class HistogramApdexAggregator extends RangeAggregator{
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
     @Valid
     @NotNull
     @Min(0)
@@ -52,7 +52,7 @@ public class HistogramApdexAggregator extends RangeAggregator{
             description = "The Apdex target for latency",
             default_value = "1"
     )
-    private double _target = -1d;
+    private double target = -1d;
 
     /**
      * Public constructor.
@@ -61,11 +61,11 @@ public class HistogramApdexAggregator extends RangeAggregator{
      */
     @Inject
     public HistogramApdexAggregator(final DoubleDataPointFactory dataPointFactory) {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     public void setTarget(final double target) {
-        _target = target;
+        this.target = target;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class HistogramApdexAggregator extends RangeAggregator{
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return _dataPointFactory.getGroupType();
+        return dataPointFactory.getGroupType();
     }
 
     private final class HistogramApdexDataPointAggregator implements RangeSubAggregator {
@@ -90,13 +90,13 @@ public class HistogramApdexAggregator extends RangeAggregator{
             long satisfied = 0;
             long acceptable = 0;
             long total = 0;
-            final double acceptableThreshold = _target * 4;
+            final double acceptableThreshold = target * 4;
             while (dataPointRange.hasNext()) {
                 final DataPoint dp = dataPointRange.next();
                 if (dp instanceof HistogramDataPoint) {
                     final HistogramDataPoint hist = (HistogramDataPoint) dp;
                     for (final Map.Entry<Double, Integer> entry : hist.getMap().entrySet()) {
-                        if (entry.getKey() <= _target) {
+                        if (entry.getKey() <= target) {
                             satisfied += entry.getValue();
                         } else if (entry.getKey() <= acceptableThreshold) {
                             acceptable += entry.getValue();
@@ -107,7 +107,7 @@ public class HistogramApdexAggregator extends RangeAggregator{
             }
 
             final double apdex = (satisfied + (acceptable / 2d)) / total;
-            return Collections.singletonList(_dataPointFactory.createDataPoint(returnTime, apdex));
+            return Collections.singletonList(dataPointFactory.createDataPoint(returnTime, apdex));
         }
     }
 }

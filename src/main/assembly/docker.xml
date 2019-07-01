@@ -39,20 +39,24 @@
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
-      <directory>${project.basedir}/target/appassembler/lib</directory>
+      <directory>${project.basedir}/target</directory>
       <outputDirectory>lib</outputDirectory>
       <fileMode>0644</fileMode>
       <includes>
         <include>${artifactId}-${artifact.version}.jar</include>
       </includes>
     </fileSet>
-    <fileSet>
-      <directory>${project.basedir}/target/appassembler/lib</directory>
-      <outputDirectory>deps</outputDirectory>
-      <fileMode>0644</fileMode>
-      <excludes>
-        <exclude>${artifactId}-${artifact.version}.jar</exclude>
-      </excludes>
-    </fileSet>
   </fileSets>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>deps</outputDirectory>
+      <includes>
+        <include>*:jar:*</include>
+      </includes>
+      <excludes>
+        <exclude>*:sources</exclude>
+        <exclude>${groupId}:${artifactId}:*</exclude>
+      </excludes>
+    </dependencySet>
+  </dependencySets>
 </assembly>

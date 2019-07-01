@@ -38,8 +38,8 @@ import java.util.Arrays;
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
-public class StorageIT {
-    private final CloseableHttpClient _client = HttpClients.createDefault();
+public final class StorageIT {
+    private final CloseableHttpClient client = HttpClients.createDefault();
 
     @Test
     public void testStoreDataPoint() throws IOException, JSONException {
@@ -48,11 +48,11 @@ public class StorageIT {
 
         final String metricName = "foo_histogram";
         final HttpPost request = KairosHelper.postHistogram(timestamp, histogram, metricName);
-        final CloseableHttpResponse response = _client.execute(request);
+        final CloseableHttpResponse response = client.execute(request);
         Assert.assertEquals(204, response.getStatusLine().getStatusCode());
 
         final HttpPost queryRequest = KairosHelper.queryFor(timestamp, timestamp, metricName);
-        final CloseableHttpResponse lookupResponse = _client.execute(queryRequest);
+        final CloseableHttpResponse lookupResponse = client.execute(queryRequest);
 
         Assert.assertEquals(200, lookupResponse.getStatusLine().getStatusCode());
         final String body = CharStreams.toString(new InputStreamReader(lookupResponse.getEntity().getContent(), Charsets.UTF_8));

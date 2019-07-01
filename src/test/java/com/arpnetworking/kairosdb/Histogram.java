@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,11 +31,11 @@ import java.util.TreeMap;
  */
 @SuppressFBWarnings("FE_FLOATING_POINT_EQUALITY")
 public class Histogram {
-    private final TreeMap<Double, Integer> _bins = new TreeMap<>();
-    private double _min;
-    private double _max;
-    private double _sum;
-    private int _count;
+    private final TreeMap<Double, Integer> bins = new TreeMap<>();
+    private double min;
+    private double max;
+    private double sum;
+    private int count;
 
     /**
      * Public constructor.
@@ -43,16 +43,16 @@ public class Histogram {
      * @param numbers The raw numbers.
      */
     public Histogram(final Iterable<Double> numbers) {
-        _min = Double.MAX_VALUE;
-        _max = -Double.MAX_VALUE;
-        _sum = 0;
-        _count = 0;
+        min = Double.MAX_VALUE;
+        max = -Double.MAX_VALUE;
+        sum = 0;
+        count = 0;
         for (Double number : numbers) {
-            _sum += number;
-            _min = Math.min(_min, number);
-            _max = Math.max(_max, number);
-            _bins.compute(Math.floor(number), (i, j) -> j == null ? 1 : j + 1);
-            _count++;
+            sum += number;
+            min = Math.min(min, number);
+            max = Math.max(max, number);
+            bins.compute(Math.floor(number), (i, j) -> j == null ? 1 : j + 1);
+            count++;
         }
     }
 
@@ -64,15 +64,15 @@ public class Histogram {
      */
     @SuppressWarnings("unchecked")
     public Histogram(final JSONObject json) throws JSONException {
-        _min = json.getDouble("min");
-        _max = json.getDouble("max");
-        _sum = json.getDouble("sum");
+        min = json.getDouble("min");
+        max = json.getDouble("max");
+        sum = json.getDouble("sum");
         final JSONObject binsJson = json.getJSONObject("bins");
         for (final Iterator<String> it = (Iterator<String>) binsJson.keys(); it.hasNext();) {
             final String key = it.next();
             final int value = binsJson.getInt(key);
-            _bins.put(Double.valueOf(key), value);
-            _count += value;
+            bins.put(Double.valueOf(key), value);
+            count += value;
 
         }
     }
@@ -85,11 +85,11 @@ public class Histogram {
             return false;
         } else if (obj.getClass().equals(getClass())) {
             final Histogram other = (Histogram) obj;
-            return other._bins.equals(_bins)
-                    && other._count == _count
-                    && other._max == _max
-                    && other._min == _min
-                    && other._sum == _sum;
+            return other.bins.equals(bins)
+                    && other.count == count
+                    && other.max == max
+                    && other.min == min
+                    && other.sum == sum;
         } else {
             return false;
         }
@@ -97,17 +97,17 @@ public class Histogram {
 
     @Override
     public int hashCode() {
-        return Objects.hash(_bins, _count, _min, _max, _sum);
+        return Objects.hash(bins, count, min, max, sum);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("min", _min)
-                .add("max", _max)
-                .add("sum", _sum)
-                .add("count", _count)
-                .add("bins", _bins)
+                .add("min", min)
+                .add("max", max)
+                .add("sum", sum)
+                .add("count", count)
+                .add("bins", bins)
                 .toString();
     }
 
@@ -119,31 +119,31 @@ public class Histogram {
      */
     public JSONObject getJson() throws JSONException {
         final JSONObject histogram = new JSONObject();
-        histogram.put("bins", _bins)
-                .put("mean", _sum / _count)
-                .put("min", _min)
-                .put("max", _max)
-                .put("sum", _sum);
+        histogram.put("bins", bins)
+                .put("mean", sum / count)
+                .put("min", min)
+                .put("max", max)
+                .put("sum", sum);
         return histogram;
     }
 
     public double getMean() {
-        return _sum / _count;
+        return sum / count;
     }
 
     public double getMin() {
-        return _min;
+        return min;
     }
 
     public double getMax() {
-        return _max;
+        return max;
     }
 
     public double getSum() {
-        return _sum;
+        return sum;
     }
 
     public TreeMap<Double, Integer> getBins() {
-        return _bins;
+        return bins;
     }
 }

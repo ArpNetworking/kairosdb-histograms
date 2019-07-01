@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ import java.util.Iterator;
         name = "hcount",
         description = "Counts the number of data points.")
 public final class HistogramCountAggregator extends RangeAggregator {
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
 
     /**
      * Public constructor.
@@ -46,7 +46,7 @@ public final class HistogramCountAggregator extends RangeAggregator {
      */
     @Inject
     public HistogramCountAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     @Override
@@ -61,7 +61,7 @@ public final class HistogramCountAggregator extends RangeAggregator {
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return _dataPointFactory.getGroupType();
+        return dataPointFactory.getGroupType();
     }
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
@@ -79,7 +79,7 @@ public final class HistogramCountAggregator extends RangeAggregator {
                 }
             }
 
-            return Collections.singletonList(_dataPointFactory.createDataPoint(returnTime, count));
+            return Collections.singletonList(dataPointFactory.createDataPoint(returnTime, count));
         }
     }
 }

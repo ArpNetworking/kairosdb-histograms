@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ import java.util.TreeMap;
         name = "hpercentile",
         description = "Finds the percentile of the data range.")
 public final class HistogramPercentileAggregator extends RangeAggregator {
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
     @NonZero
     @FeatureProperty(
             label = "Percentile",
@@ -59,7 +59,7 @@ public final class HistogramPercentileAggregator extends RangeAggregator {
                     )
             }
     )
-    private double _percentile = -1d;
+    private double percentile = -1d;
 
     /**
      * Public constructor.
@@ -69,11 +69,11 @@ public final class HistogramPercentileAggregator extends RangeAggregator {
      */
     @Inject
     public HistogramPercentileAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     public void setPercentile(final double percentile) {
-        _percentile = percentile;
+        this.percentile = percentile;
     }
 
     @Override
@@ -88,7 +88,7 @@ public final class HistogramPercentileAggregator extends RangeAggregator {
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return _dataPointFactory.getGroupType();
+        return dataPointFactory.getGroupType();
     }
 
     private final class HistogramMeanDataPointAggregator implements RangeSubAggregator {
@@ -108,14 +108,14 @@ public final class HistogramPercentileAggregator extends RangeAggregator {
                 }
             }
 
-            final long target = (long) Math.ceil(_percentile * count);
+            final long target = (long) Math.ceil(percentile * count);
             long current = 0;
             final Iterator<Map.Entry<Double, Integer>> entryIterator = merged.entrySet().iterator();
             while (entryIterator.hasNext()) {
                 final Map.Entry<Double, Integer> entry = entryIterator.next();
                 current += entry.getValue();
                 if (current >= target) {
-                    return Collections.singletonList(_dataPointFactory.createDataPoint(returnTime, entry.getKey()));
+                    return Collections.singletonList(dataPointFactory.createDataPoint(returnTime, entry.getKey()));
                 }
             }
             return Collections.emptyList();

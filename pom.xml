@@ -16,18 +16,18 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>com.arpnetworking.build</groupId>
-    <artifactId>arpnetworking-parent-pom</artifactId>
-    <version>1.1.4</version>
+    <groupId>io.inscopemetrics.build</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>2.0.5</version>
     <relativePath />
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.arpnetworking.kairosdb</groupId>
-  <artifactId>kairosdb-histograms</artifactId>
+  <groupId>io.inscopemetrics.kairosdb</groupId>
+  <artifactId>kairosdb-extensions</artifactId>
   <packaging>jar</packaging>
-  <name>KairosDB Histograms</name>
-  <description>Histograms for KairosDB.</description>
+  <name>KairosDB Extensions</name>
+  <description>Extensions for KairosDB.</description>
   <version>2.1.5-SNAPSHOT</version>
 
   <licenses>
@@ -43,9 +43,9 @@
     <developer>
       <id>barp</id>
       <name>Brandon Arp</name>
-      <email>brandon.arp@inscopemetrics.com</email>
+      <email>brandon.arp@inscopemetrics.io</email>
       <organization>Inscope Metrics</organization>
-      <organizationUrl>http://www.inscopemetrics.com</organizationUrl>
+      <organizationUrl>http://www.inscopemetrics.io</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -53,9 +53,9 @@
     <developer>
       <id>vkoskela</id>
       <name>Ville Koskela</name>
-      <email>ville.koskela@inscopemetrics.com</email>
+      <email>ville.koskela@inscopemetrics.io</email>
       <organization>Inscope Metrics</organization>
-      <organizationUrl>http://www.inscopemetrics.com</organizationUrl>
+      <organizationUrl>http://www.inscopemetrics.io</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>
@@ -70,41 +70,52 @@
   </scm>
 
   <properties>
-    <!--Dependency versions-->
-    <findbugs.annotations.version>3.0.1</findbugs.annotations.version>
+    <!-- Dependency Versions -->
     <aspectjrt.version>1.8.9</aspectjrt.version>
-
-    <!-- Test deps -->
-    <junit.version>4.12</junit.version>
-    <mockito.version>1.10.19</mockito.version>
-    <hamcrest.version>1.3</hamcrest.version>
-    <apache.httpclient.version>4.5.3</apache.httpclient.version>
-    <apache.httpcore.version>4.4.6</apache.httpcore.version>
-
+    <spotbugs.annotations.version>3.1.12</spotbugs.annotations.version>
 
     <!-- Provided by KairosDB
-         NOTE: These need to be updated when KairosDB version changes-->
-    <guice.version>4.1.0</guice.version>
-    <guava.version>19.0</guava.version>
-    <kairosdb.version>1.2.0-1</kairosdb.version>
-    <slf4j.version>1.7.2</slf4j.version>
+         NOTE: These need to be kept synchronized wrt version when KairosDB version changes -->
+    <apache.httpclient.version>4.3.6</apache.httpclient.version>
+    <apache.httpcore.version>4.3.3</apache.httpcore.version>
     <gson.version>2.2.4</gson.version>
-    <org.json.version>chargebee-1.0</org.json.version>
-    <apache.lang3.version>3.4</apache.lang3.version>
+    <guava.version>19.0</guava.version>
+    <guice.version>4.1.0</guice.version>
+    <javax.inject.version>1</javax.inject.version>
+    <javax.validation.api.version>1.0.0.GA</javax.validation.api.version>
     <joda.version>2.3</joda.version>
+    <jsr305.version>2.0.2</jsr305.version>
+    <kairosdb.version>1.2.1-1</kairosdb.version>
+    <org.json.version>chargebee-1.0</org.json.version>
+    <slf4j.version>1.7.2</slf4j.version>
 
-    <!-- Additional Plugins -->
-    <docker.maven.plugin.version>0.27.2</docker.maven.plugin.version>
-    <maven.assembly.plugin.version>2.6</maven.assembly.plugin.version>
-    <rpm.maven.plugin.version>2.1.5</rpm.maven.plugin.version>
+    <!-- Test Dependency Versions -->
+    <hamcrest.version>2.1</hamcrest.version>
+    <junit.version>4.12</junit.version>
+    <mockito.version>2.23.4</mockito.version>
+
+    <!-- Plugin Versions -->
+    <docker.maven.plugin.version>0.30.0</docker.maven.plugin.version>
+    <maven.assembly.plugin.version>3.1.1</maven.assembly.plugin.version>
+    <rpm.maven.plugin.version>2.2.0</rpm.maven.plugin.version>
 
     <!-- Code Coverage -->
-    <jacoco.check.line.coverage>0.00</jacoco.check.line.coverage>
-    <jacoco.check.branch.coverage>0.00</jacoco.check.branch.coverage>
+    <jacoco.check.line.coverage>0.3</jacoco.check.line.coverage>
+    <jacoco.check.branch.coverage>0.5</jacoco.check.branch.coverage>
+    <jacoco.check.cyclomatic.complexity>20.0</jacoco.check.cyclomatic.complexity>
 
-    <!-- JVM Debug -->
-    <debugJavaOptions />
-    <debugJavaPort>9000</debugJavaPort>
+    <!-- Assembly -->
+    <tgz.finalName>${project.build.finalName}</tgz.finalName>
+
+    <!-- Project -->
+    <buildDirectory>${project.basedir}/target</buildDirectory>
+
+    <!-- JVM -->
+    <dockerJavaOptions />
+    <debugJavaPort>9004</debugJavaPort>
+
+    <!-- Docker -->
+    <skipDockerBuild>false</skipDockerBuild>
   </properties>
   <build>
     <resources>
@@ -114,27 +125,7 @@
       </resource>
     </resources>
     <plugins>
-      <!-- Enable Inherited Plugins -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>findbugs-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-      </plugin>
+      <!-- Configure Inherited Plugins -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -145,44 +136,12 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-      </plugin>
-      <plugin>
         <groupId>com.rimerosolutions.maven.plugins</groupId>
         <artifactId>wrapper-maven-plugin</artifactId>
         <inherited>false</inherited>
       </plugin>
 
       <!-- Project Specific Plugins -->
-        <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>appassembler-maven-plugin</artifactId>
-        <configuration>
-          <programs>
-            <program>
-              <id>kairosdb-histograms</id>
-              <mainClass>com.arpnetworking.DoesNotExist</mainClass>
-            </program>
-          </programs>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -204,21 +163,22 @@
               </descriptors>
             </configuration>
           </execution>
-            <execution>
-                <id>bin-assembly</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>single</goal>
-                </goals>
-                <configuration>
-                    <appendAssemblyId>true</appendAssemblyId>
-                    <attach>false</attach>
-                    <tarLongFileMode>posix</tarLongFileMode>
-                    <descriptors>
-                        <descripto>src/main/assembly/bin.xml</descripto>
-                    </descriptors>
-                </configuration>
-            </execution>
+          <execution>
+            <id>bin-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <finalName>${tgz.finalName}</finalName>
+              <appendAssemblyId>true</appendAssemblyId>
+              <attach>false</attach>
+              <tarLongFileMode>posix</tarLongFileMode>
+              <descriptors>
+                <descripto>src/main/assembly/bin.xml</descripto>
+              </descriptors>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -233,13 +193,6 @@
             <goals>
               <goal>build</goal>
             </goals>
-          </execution>
-          <execution>
-            <id>default-remove</id>
-            <phase>validate</phase>
-            <configuration>
-              <removeAll>true</removeAll>
-            </configuration>
           </execution>
           <execution>
             <id>default-start</id>
@@ -261,12 +214,22 @@
               <skip>${skipIntegrationTests}</skip>
             </configuration>
           </execution>
+          <execution>
+            <id>default-push</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>push</goal>
+            </goals>
+          </execution>
         </executions>
         <configuration>
+          <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
           <showLogs>true</showLogs>
           <images>
+            <!-- KairosDb -->
             <image>
-              <name>arpnetworking/kairos-histograms:${project.version}</name>
+              <name>inscopemetrics/kairosdb-extensions:${project.version}</name>
+              <alias>kairosdb</alias>
               <build>
                 <dockerFile>${project.build.directory}/docker-assembly/Dockerfile</dockerFile>
                 <tags>
@@ -275,11 +238,16 @@
               </build>
               <run>
                 <env>
-                  <JAVA_OPTS>${debugJavaOptions}</JAVA_OPTS>
+                  <JAVA_OPTS>${dockerJavaOptions}</JAVA_OPTS>
                 </env>
+                <network>
+                  <mode>custom</mode>
+                  <name>kairosdb-net</name>
+                  <alias>kairosdb</alias>
+                </network>
                 <ports>
-                  <port>${debugJavaPort}:${debugJavaPort}</port>
-                  <port>8080:8080</port>
+                  <port>+kairosdb.ip:${debugJavaPort}:${debugJavaPort}</port>
+                  <port>+kairosdb.ip:8082:8080</port>
                 </ports>
                 <volumes>
                   <bind>
@@ -288,31 +256,43 @@
                 </volumes>
                 <wait>
                   <http>
-                    <url>http://${docker.host.address}:8080/</url>
+                    <url>http://${kairosdb.ip}:8082/api/v1/health/status</url>
                     <method>GET</method>
                     <status>200</status>
                   </http>
-                  <!-- NOTE: The service is _really_ slow to start-up under native docker -->
-                  <time>150000</time>
+                  <time>30000</time>
                   <kill>1000</kill>
                 </wait>
               </run>
             </image>
           </images>
+          <skip>${skipDockerBuild}</skip>
         </configuration>
       </plugin>
     </plugins>
   </build>
 
   <dependencies>
-    <!-- Logging -->
+    <!-- Provided by KairosDb (directly or transitively)
+         NOTE: These need to be kept synchronized wrt order when KairosDB version changes -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
+      <groupId>org.kairosdb</groupId>
+      <artifactId>kairosdb</artifactId>
+      <version>${kairosdb.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <!-- TODO(ville): Remove suppression once findbugs to spotbugs migration is complete -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>findbugs-annotations</artifactId>
+        </exclusion>
+          <!-- TODO(ville): Remove once KairosDb marks Hamcrest for test. -->
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+          </exclusion>
+      </exclusions>
     </dependency>
-    <!-- Google -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
@@ -320,9 +300,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>${guice.version}</version>
+      <!-- Transitively via guava-retrying -->
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>${jsr305.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -338,59 +319,36 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <version>1</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- KairosDB -->
-    <dependency>
-      <groupId>org.kairosdb</groupId>
-      <artifactId>kairosdb</artifactId>
-      <version>${kairosdb.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- Test-->
-    <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>findbugs-annotations</artifactId>
-      <version>${findbugs.annotations.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>${mockito.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>${hamcrest.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
+      <!-- Transitively locked by KairosDb; although here only a test dependency -->
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
       <version>${apache.httpclient.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>${apache.lang3.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>1.0.0.GA</version>
+      <!-- Transitively locked by KairosDb; although here only a test dependency -->
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>${apache.httpcore.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
+      <version>${guice.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- Transitively via guice-parent -->
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <version>${javax.inject.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -400,49 +358,55 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>${apache.httpcore.version}</version>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>${javax.validation.api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Dependencies -->
+    <dependency>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>${spotbugs.annotations.version}</version>
+      <exclusions>
+        <!-- TODO(ville): Remove suppression once KairosDb updates jsr305 dependency -->
+        <exclusion>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>jsr305</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <!-- TODO(ville): Remove once JUnit depends on modern hamcrest; see:
+            http://hamcrest.org/JavaHamcrest/distributables
+        -->
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <version>${hamcrest.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <profiles>
-    <profile>
-      <id>performanceTest</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>default-test</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                  <includes>
-                    <include>**/*PT.java</include>
-                  </includes>
-                  <systemPropertyVariables>
-                    <logback.configurationFile>${basedir}/src/test/resources/logback-perf.xml</logback.configurationFile>
-                  </systemPropertyVariables>
-                  <parallel combine.self="override" />
-                  <forkCount>1</forkCount>
-                  <reuseForks>false</reuseForks>
-                  <argLine>-agentlib:hprof=cpu=samples,depth=15,interval=5,force=y,file=${basedir}/target/perf.profile.hprof.txt</argLine>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
     <profile>
       <id>rpm</id>
       <activation>
@@ -474,7 +438,10 @@
                   <directory>/opt/kairosdb/lib</directory>
                   <sources>
                     <source>
-                      <location>target/appassembler/lib</location>
+                      <location>${buildDirectory}/docker-assembly/deps</location>
+                    </source>
+                    <source>
+                      <location>${buildDirectory}/docker-assembly/lib</location>
                     </source>
                   </sources>
                   <directoryIncluded>false</directoryIncluded>
@@ -483,7 +450,7 @@
                   <directory>/opt/kairosdb/conf</directory>
                   <sources>
                     <source>
-                      <location>config</location>
+                      <location>${buildDirectory}/docker-assembly/config</location>
                     </source>
                   </sources>
                   <directoryIncluded>false</directoryIncluded>
@@ -504,7 +471,17 @@
         </property>
       </activation>
       <properties>
-        <debugJavaOptions>-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=${debugJavaPort},suspend=y</debugJavaOptions>
+        <dockerJavaOptions>-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=${debugJavaPort},suspend=y</dockerJavaOptions>
+      </properties>
+    </profile>
+    <profile>
+      <id>no-docker</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <skipIntegrationTests>true</skipIntegrationTests>
+        <skipDockerBuild>true</skipDockerBuild>
       </properties>
     </profile>
   </profiles>

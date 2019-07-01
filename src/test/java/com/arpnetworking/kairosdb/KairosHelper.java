@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +31,8 @@ import java.io.UnsupportedEncodingException;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public final class KairosHelper {
+    private static final long TIME_TO_LIVE_IN_SECONDS = 600;
+
     private KairosHelper() { }
 
     /**
@@ -55,7 +57,7 @@ public final class KairosHelper {
         datapoints.put(datapoint);
 
         metric.put("name", metricName)
-                .put("ttl", 600)
+                .put("ttl", TIME_TO_LIVE_IN_SECONDS)
                 .put("type", "histogram")
                 .put("datapoints", datapoints)
                 .put("tags", tags);
@@ -160,7 +162,7 @@ public final class KairosHelper {
 
         final String dockerHostAddress = System.getProperty("dockerHostAddress");
         final String hostAddress = dockerHostAddress == null ? "localhost" : dockerHostAddress;
-        return "http://" + hostAddress + ":8080";
+        return "http://" + hostAddress + ":8082";
     }
 
     /**
@@ -185,7 +187,7 @@ public final class KairosHelper {
         datapoints.put(datapoint);
 
         metric.put("name", metricName)
-                .put("ttl", 600)
+                .put("ttl", TIME_TO_LIVE_IN_SECONDS)
                 .put("datapoints", datapoints)
                 .put("tags", tags);
 

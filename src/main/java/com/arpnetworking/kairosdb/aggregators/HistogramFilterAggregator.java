@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,9 +41,6 @@ import java.util.TreeMap;
         name = "hfilter",
         description = "Filters histograms according to filter operation")
 public class HistogramFilterAggregator implements Aggregator {
-
-    private static final int PRECISION = 7;
-
     /**
      * Whether to keep or discard indeterminate buckets when filtering.
      */
@@ -78,7 +75,7 @@ public class HistogramFilterAggregator implements Aggregator {
             options = {"lte", "lt", "gte", "gt", "equal"},
             default_value = "equal"
     )
-    private FilterAggregator.FilterOperation _filterop;
+    private FilterAggregator.FilterOperation filterOp;
 
     @FeatureProperty(
             name = "filter_indeterminate_inclusion",
@@ -88,14 +85,14 @@ public class HistogramFilterAggregator implements Aggregator {
             options = {"keep", "discard"},
             default_value = "keep"
     )
-    private FilterIndeterminate _filterinc;
+    private FilterIndeterminate filterinc;
 
     @FeatureProperty(
             label = "Threshold",
             description = "The value the operation is performed on. If the operation is lt, then a null data point "
                     + "is returned if the data point is less than the threshold."
     )
-    private double _threshold;
+    private double threshold;
 
 
     /**
@@ -103,21 +100,21 @@ public class HistogramFilterAggregator implements Aggregator {
      */
     @Inject
     public HistogramFilterAggregator() {
-        _threshold = 0.0;
-        _filterop = FilterAggregator.FilterOperation.EQUAL;
-        _filterinc = FilterIndeterminate.KEEP;
+        threshold = 0.0;
+        filterOp = FilterAggregator.FilterOperation.EQUAL;
+        filterinc = FilterIndeterminate.KEEP;
     }
 
-    public void setFilterOp(final FilterAggregator.FilterOperation filterop) {
-        _filterop = filterop;
+    public void setFilterOp(final FilterAggregator.FilterOperation filterOp) {
+        this.filterOp = filterOp;
     }
 
     public void setThreshold(final double threshold) {
-        _threshold = threshold;
+        this.threshold = threshold;
     }
 
     public void setFilterIndeterminateInclusion(final FilterIndeterminate inclusion) {
-        _filterinc = inclusion;
+        filterinc = inclusion;
     }
 
     @Override
@@ -150,10 +147,13 @@ public class HistogramFilterAggregator implements Aggregator {
      */
     static double binInclusiveBound(final double val) {
         long bound = Double.doubleToLongBits(val);
+        // TODO(ville): Extract the magic numbers and if necessary add documentation.
+        // CHECKSTYLE.OFF: MagicNumber -
         bound >>= 45;
         bound += 1;
         bound <<= 45;
         bound -= 1;
+        // CHECKSTYLE.OFF: MagicNumber
 
         return Double.longBitsToDouble(bound);
     }
@@ -233,34 +233,40 @@ public class HistogramFilterAggregator implements Aggregator {
                     }
                 }
             }
-            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max,
-                    sum / count, sum, originalCount);
+            return new HistogramDataPointImpl(
+                    timeStamp,
+                    filtered,
+                    min,
+                    max,
+                    sum / count,
+                    sum,
+                    originalCount);
         }
 
         private boolean histNotChangedByThreshold(final HistogramDataPoint hist) {
-            switch (_filterop) {
+            switch (filterOp) {
                 case GT:
-                    return _threshold >= hist.getMax();
+                    return threshold >= hist.getMax();
                 case GTE:
-                    return _threshold > hist.getMax();
+                    return threshold > hist.getMax();
                 case LT:
-                    return _threshold <= hist.getMin();
+                    return threshold <= hist.getMin();
                 case LTE:
-                    return _threshold < hist.getMin();
+                    return threshold < hist.getMin();
                 case EQUAL:
-                    return _threshold < hist.getMin() || hist.getMax() < _threshold
-                            && _filterinc == FilterIndeterminate.DISCARD;
+                    return threshold < hist.getMin() || hist.getMax() < threshold
+                            && filterinc == FilterIndeterminate.DISCARD;
                 default:
                     throw new IllegalStateException("Unsupported FilterOp Enum type");
             }
         }
 
         private boolean minNotChangedByThreshold(final HistogramDataPoint hist) {
-            switch (_filterop) {
+            switch (filterOp) {
                 case LT:
-                    return _threshold <= hist.getMin();
+                    return threshold <= hist.getMin();
                 case LTE:
-                    return _threshold < hist.getMin();
+                    return threshold < hist.getMin();
                 case EQUAL:
                     return !shouldDiscard(hist.getMin());
                 default:
@@ -269,11 +275,11 @@ public class HistogramFilterAggregator implements Aggregator {
         }
 
         private boolean maxNotChangedByThreshold(final HistogramDataPoint hist) {
-            switch (_filterop) {
+            switch (filterOp) {
                 case GT:
-                    return _threshold >= hist.getMax();
+                    return threshold >= hist.getMax();
                 case GTE:
-                    return _threshold > hist.getMax();
+                    return threshold > hist.getMax();
                 case EQUAL:
                     return !shouldDiscard(hist.getMax());
                 default:
@@ -303,42 +309,42 @@ public class HistogramFilterAggregator implements Aggregator {
              *  Ref:
              *      https://github.com/kairosdb/kairosdb/pull/555
              *      https://github.com/ddimensia/kairosdb
-            if (_filterop == FilterAggregator.FilterOperation.EQUAL) {
-                if (_filterinc == FilterIndeterminate.DISCARD) {
-                    return _threshold >= lowerBound && _threshold <= upperBound;
-                } else if (_filterinc == FilterIndeterminate.KEEP) {
+            if (filterOp == FilterAggregator.FilterOperation.EQUAL) {
+                if (filterinc == FilterIndeterminate.DISCARD) {
+                    return threshold >= lowerBound && threshold <= upperBound;
+                } else if (filterinc == FilterIndeterminate.KEEP) {
                     return false;
                 }
             } else {
-                final boolean thresholdAcceptsLowerBound = _filterop.compare(lowerBound, _threshold);
-                final boolean thresholdAcceptsUpperBound = _filterop.compare(upperBound, _threshold);
-                return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                final boolean thresholdAcceptsLowerBound = filterOp.compare(lowerBound, threshold);
+                final boolean thresholdAcceptsUpperBound = filterOp.compare(upperBound, threshold);
+                return filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
             }
             */
             //=================================================================
             final boolean thresholdAcceptsLowerBound;
             final boolean thresholdAcceptsUpperBound;
-            switch (_filterop) {
+            switch (filterOp) {
                 case LTE:
-                    thresholdAcceptsLowerBound = lowerBound <= _threshold;
-                    thresholdAcceptsUpperBound = upperBound <= _threshold;
-                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                    thresholdAcceptsLowerBound = lowerBound <= threshold;
+                    thresholdAcceptsUpperBound = upperBound <= threshold;
+                    return filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
                 case LT:
-                    thresholdAcceptsLowerBound = lowerBound < _threshold;
-                    thresholdAcceptsUpperBound = upperBound < _threshold;
-                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                    thresholdAcceptsLowerBound = lowerBound < threshold;
+                    thresholdAcceptsUpperBound = upperBound < threshold;
+                    return filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
                 case GTE:
-                    thresholdAcceptsLowerBound = lowerBound >= _threshold;
-                    thresholdAcceptsUpperBound = upperBound >= _threshold;
-                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                    thresholdAcceptsLowerBound = lowerBound >= threshold;
+                    thresholdAcceptsUpperBound = upperBound >= threshold;
+                    return filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
                 case GT:
-                    thresholdAcceptsLowerBound = lowerBound > _threshold;
-                    thresholdAcceptsUpperBound = upperBound > _threshold;
-                    return _filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
+                    thresholdAcceptsLowerBound = lowerBound > threshold;
+                    thresholdAcceptsUpperBound = upperBound > threshold;
+                    return filterinc.shouldDiscard(thresholdAcceptsLowerBound, thresholdAcceptsUpperBound);
                 case EQUAL:
-                    if (_filterinc == FilterIndeterminate.DISCARD) {
-                        return _threshold >= lowerBound && _threshold <= upperBound;
-                    } else if (_filterinc == FilterIndeterminate.KEEP) {
+                    if (filterinc == FilterIndeterminate.DISCARD) {
+                        return threshold >= lowerBound && threshold <= upperBound;
+                    } else if (filterinc == FilterIndeterminate.KEEP) {
                         return false;
                     } else {
                         throw new IllegalStateException("Unsupported FilterIndeterminateInclusion Enum type");

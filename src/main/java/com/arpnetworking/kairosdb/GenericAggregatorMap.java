@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,10 +32,10 @@ import javax.inject.Provider;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class GenericAggregatorMap<T extends Aggregator> {
-    private final List<Provider<? extends T>> _providers;
-    private final Map<String, Optional<Provider<? extends T>>> _groupMap = Maps.newConcurrentMap();
-    private final Map<String, Optional<Provider<? extends T>>> _datastoreDataTypeMap = Maps.newConcurrentMap();
-    private final KairosDataPointFactory _dataPointFactory;
+    private final List<Provider<? extends T>> providers;
+    private final Map<String, Optional<Provider<? extends T>>> groupMap = Maps.newConcurrentMap();
+    private final Map<String, Optional<Provider<? extends T>>> datastoreDataTypeMap = Maps.newConcurrentMap();
+    private final KairosDataPointFactory dataPointFactory;
 
     /**
      * Public constructor.
@@ -46,8 +46,8 @@ public class GenericAggregatorMap<T extends Aggregator> {
     public GenericAggregatorMap(
             final KairosDataPointFactory dataPointFactory,
             final List<Provider<? extends T>> aggregators) {
-        _providers = Lists.newArrayList(aggregators);
-        _dataPointFactory = dataPointFactory;
+        providers = Lists.newArrayList(aggregators);
+        this.dataPointFactory = dataPointFactory;
     }
 
     /**
@@ -57,7 +57,7 @@ public class GenericAggregatorMap<T extends Aggregator> {
      * @return aggregator to use
      */
     public Optional<Provider<? extends T>> aggregatorForGroupType(final String groupType) {
-        return _groupMap.computeIfAbsent(groupType, this::findAggregatorByGroupType);
+        return groupMap.computeIfAbsent(groupType, this::findAggregatorByGroupType);
     }
 
     /**
@@ -67,16 +67,16 @@ public class GenericAggregatorMap<T extends Aggregator> {
      * @return aggregator to use
      */
     public Optional<T> aggregatorForDataStoreDataType(final String dataStoreDataType) {
-        return _datastoreDataTypeMap.computeIfAbsent(dataStoreDataType, this::findAggregatorByDataStoreDataType).map(Provider::get);
+        return datastoreDataTypeMap.computeIfAbsent(dataStoreDataType, this::findAggregatorByDataStoreDataType).map(Provider::get);
     }
 
     private Optional<Provider<? extends T>> findAggregatorByDataStoreDataType(final String dataStoreDataType) {
-        final String groupType = _dataPointFactory.getFactoryForDataStoreType(dataStoreDataType).getGroupType();
+        final String groupType = dataPointFactory.getFactoryForDataStoreType(dataStoreDataType).getGroupType();
         return aggregatorForGroupType(groupType);
     }
 
     private Optional<Provider<? extends T>> findAggregatorByGroupType(final String groupType) {
-        for (final Provider<? extends T> provider : _providers) {
+        for (final Provider<? extends T> provider : providers) {
             final T aggregator = provider.get();
             if (aggregator.canAggregate(groupType)) {
                 return Optional.of(provider);

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,9 +29,9 @@ import java.util.function.Consumer;
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */
 public class PeekableDataPointGroup implements DataPointGroup {
-    private final DataPointGroup _wrapped;
-    private DataPoint _peeked = null;
-    private boolean _havePeeked = false;
+    private final DataPointGroup wrapped;
+    private DataPoint peeked = null;
+    private boolean havePeeked = false;
 
     /**
      * Public constructor.
@@ -39,38 +39,38 @@ public class PeekableDataPointGroup implements DataPointGroup {
      * @param wrapped The {@link DataPointGroup} to wrap.
      */
     public PeekableDataPointGroup(final DataPointGroup wrapped) {
-        _wrapped = wrapped;
+        this.wrapped = wrapped;
     }
 
     @Override
     public String getName() {
-        return _wrapped.getName();
+        return wrapped.getName();
     }
 
     @Override
     public List<GroupByResult> getGroupByResult() {
-        return _wrapped.getGroupByResult();
+        return wrapped.getGroupByResult();
     }
 
     @Override
     public void close() {
-        _wrapped.close();
+        wrapped.close();
     }
 
     @Override
     public boolean hasNext() {
-        return _havePeeked || _wrapped.hasNext();
+        return havePeeked || wrapped.hasNext();
     }
 
     @Override
     public DataPoint next() {
-        if (_havePeeked) {
-            final DataPoint item = _peeked;
-            _havePeeked = false;
-            _peeked = null;
+        if (havePeeked) {
+            final DataPoint item = peeked;
+            havePeeked = false;
+            peeked = null;
             return item;
         }
-        return _wrapped.next();
+        return wrapped.next();
     }
 
     /**
@@ -79,34 +79,34 @@ public class PeekableDataPointGroup implements DataPointGroup {
      * @return the next element
      */
     public DataPoint peek() {
-        if (!_havePeeked) {
-            _peeked = _wrapped.next();
-            _havePeeked = true;
+        if (!havePeeked) {
+            peeked = wrapped.next();
+            havePeeked = true;
         }
 
-        return _peeked;
+        return peeked;
     }
 
     @Override
     public void remove() {
-        if (_havePeeked) {
+        if (havePeeked) {
             throw new IllegalStateException("Can't remove after you've peeked at next");
         }
-        _wrapped.remove();
+        wrapped.remove();
     }
 
     @Override
     public void forEachRemaining(final Consumer<? super DataPoint> action) {
-        _wrapped.forEachRemaining(action);
+        wrapped.forEachRemaining(action);
     }
 
     @Override
     public Set<String> getTagNames() {
-        return _wrapped.getTagNames();
+        return wrapped.getTagNames();
     }
 
     @Override
     public Set<String> getTagValues(final String tag) {
-        return _wrapped.getTagValues(tag);
+        return wrapped.getTagValues(tag);
     }
 }

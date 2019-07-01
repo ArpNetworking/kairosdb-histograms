@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,6 +39,7 @@ import java.util.TreeMap;
         name = "merge",
         description = "Merges histograms.")
 public final class HistogramMergeAggregator extends RangeAggregator {
+
     /**
      * Public constructor.
      *
@@ -91,7 +92,15 @@ public final class HistogramMergeAggregator extends RangeAggregator {
 
             final double mean = sum / count;
 
-            return Collections.singletonList(new HistogramDataPointImpl(returnTime, 7, merged, min, max, mean, sum, originalCount));
+            return Collections.singletonList(
+                    new HistogramDataPointImpl(
+                            returnTime,
+                            merged,
+                            min,
+                            max,
+                            mean,
+                            sum,
+                            originalCount));
         }
     }
 }

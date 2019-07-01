@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ import java.util.NoSuchElementException;
         name = "percent_remaining",
         description = "Calculates the percent remaining of the original data points in a histogram")
 public class HistogramPercentRemainingAggregator implements Aggregator {
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
 
     /**
      * Public Constructor.
@@ -47,7 +47,7 @@ public class HistogramPercentRemainingAggregator implements Aggregator {
      */
     @Inject
     public HistogramPercentRemainingAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class HistogramPercentRemainingAggregator implements Aggregator {
                     percent = -1; //Should never start with an empty histogram
                 }
                 moveCurrentDataPoint();
-                return _dataPointFactory.createDataPoint(dp.getTimestamp(), percent);
+                return dataPointFactory.createDataPoint(dp.getTimestamp(), percent);
             } else {
                 throw new IllegalArgumentException("Cannot compute percent remaining of non histogram data point");
             }

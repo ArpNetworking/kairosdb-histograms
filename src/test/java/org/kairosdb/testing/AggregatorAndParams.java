@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,8 +23,8 @@ import java.util.Map;
  * @author Joey Jackson (jjackson at dropbox dot com)
  */
 public class AggregatorAndParams {
-    private String _aggregator;
-    private Map<String, ?> _params;
+    private String aggregator;
+    private Map<String, ?> params;
 
     /**
      * Public constructor.
@@ -33,15 +33,15 @@ public class AggregatorAndParams {
      * @param params the parameters for the aggregator
      */
     public AggregatorAndParams(final String aggregator, final Map<String, ?> params) {
-        this._aggregator = aggregator;
-        this._params = params;
+        this.aggregator = aggregator;
+        this.params = params;
     }
 
     public final String getAggregator() {
-        return _aggregator;
+        return aggregator;
     }
 
     public final Map<String, ?> getParams() {
-        return _params;
+        return params;
     }
 }

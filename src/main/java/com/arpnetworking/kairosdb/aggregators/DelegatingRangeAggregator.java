@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,6 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.DelegatingRangeAggregatorMap;
-import org.apache.commons.lang3.NotImplementedException;
 import org.joda.time.DateTimeZone;
 import org.kairosdb.core.DataPoint;
 import org.kairosdb.core.aggregator.RangeAggregator;
@@ -35,10 +34,11 @@ import javax.inject.Provider;
  */
 public class DelegatingRangeAggregator extends RangeAggregator {
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegatingRangeAggregator.class);
-    private final DelegatingRangeAggregatorMap _aggregatorMap;
-    private boolean _sampleAlign;
-    private long _startTime;
-    private DateTimeZone _timeZone = DateTimeZone.UTC;
+
+    private final DelegatingRangeAggregatorMap aggregatorMap;
+    private boolean sampleAlign;
+    private long startTime;
+    private DateTimeZone timeZone = DateTimeZone.UTC;
 
     /**
      * Public constructor.
@@ -46,24 +46,24 @@ public class DelegatingRangeAggregator extends RangeAggregator {
      * @param aggregatorMap aggregators to use
      */
     public DelegatingRangeAggregator(final DelegatingRangeAggregatorMap aggregatorMap) {
-        _aggregatorMap = aggregatorMap;
+        this.aggregatorMap = aggregatorMap;
     }
 
     @Override
     public void setAlignSampling(final boolean align) {
-        _sampleAlign = align;
+        sampleAlign = align;
         super.setAlignSampling(align);
     }
 
     @Override
     public void setStartTime(final long startTime) {
-        _startTime = startTime;
+        this.startTime = startTime;
         super.setStartTime(startTime);
     }
 
     @Override
     public void setTimeZone(final DateTimeZone timeZone) {
-        _timeZone = timeZone;
+        this.timeZone = timeZone;
         super.setTimeZone(timeZone);
     }
 
@@ -79,17 +79,17 @@ public class DelegatingRangeAggregator extends RangeAggregator {
             dataType = DoubleDataPointFactoryImpl.DST_DOUBLE;
         }
 
-        final Optional<RangeAggregator> aggregatorOptional = _aggregatorMap.aggregatorForDataStoreDataType(dataType);
+        final Optional<RangeAggregator> aggregatorOptional = aggregatorMap.aggregatorForDataStoreDataType(dataType);
         if (!aggregatorOptional.isPresent()) {
             throw new IllegalArgumentException("Cannot aggregate a " + dataType);
         }
 
         final RangeAggregator aggregator = aggregatorOptional.get();
         LOGGER.trace("Delegating to a " + aggregator.getClass().getSimpleName());
-        aggregator.setAlignSampling(_sampleAlign);
-        aggregator.setStartTime(_startTime);
+        aggregator.setAlignSampling(sampleAlign);
+        aggregator.setStartTime(startTime);
         aggregator.setAlignStartTime(m_alignStartTime);
-        aggregator.setTimeZone(_timeZone);
+        aggregator.setTimeZone(timeZone);
         aggregator.setSampling(m_sampling);
 
         setProperties(aggregator);
@@ -106,17 +106,17 @@ public class DelegatingRangeAggregator extends RangeAggregator {
 
     @Override
     protected RangeSubAggregator getSubAggregator() {
-        throw new NotImplementedException("Delegating aggregators do not provide a subAggregator");
+        throw new UnsupportedOperationException("Delegating aggregators do not provide a subAggregator");
     }
 
     @Override
     public boolean canAggregate(final String groupType) {
-        return _aggregatorMap.aggregatorForGroupType(groupType).isPresent();
+        return aggregatorMap.aggregatorForGroupType(groupType).isPresent();
     }
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        final Optional<Provider<? extends RangeAggregator>> provider = _aggregatorMap.aggregatorForGroupType(groupType);
+        final Optional<Provider<? extends RangeAggregator>> provider = aggregatorMap.aggregatorForGroupType(groupType);
         if (provider.isPresent()) {
             return provider.get().get().getAggregatedGroupType(groupType);
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,10 +34,10 @@ import java.util.TreeMap;
 
 /**
  * Test class for MovingWindowAggregator.
- * 
+ *
  * @author Gil Markham (gmarkham at dropbox dot com)
  */
-public class MovingWindowAggregatorTest {
+public final class MovingWindowAggregatorTest {
     @Test
     public void testMultipleMonthAggregationWithUTC() {
         final ListDataPointGroup dpGroup = new ListDataPointGroup("range_group");

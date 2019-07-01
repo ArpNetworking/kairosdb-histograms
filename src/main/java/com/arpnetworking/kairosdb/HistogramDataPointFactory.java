@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,13 +40,6 @@ public class HistogramDataPointFactory implements DataPointFactory {
      */
     public static final String GROUP_TYPE = "histogram";
 
-    /**
-     * Default constructor.
-     */
-    public HistogramDataPointFactory() {
-//        LOGGER.info("HDPF online and ready");
-    }
-
     @Override
     public String getDataStoreType() {
         return DST;
@@ -72,7 +65,7 @@ public class HistogramDataPointFactory implements DataPointFactory {
             binValues.put(Double.parseDouble(entry.getKey()), entry.getValue().getAsInt());
         }
 
-        return new HistogramDataPointImpl(timestamp, 7, binValues, min, max, mean, sum);
+        return new HistogramDataPointImpl(timestamp, binValues, min, max, mean, sum);
     }
 
     @Override
@@ -88,6 +81,6 @@ public class HistogramDataPointFactory implements DataPointFactory {
         final double mean = buffer.readDouble();
         final double sum = buffer.readDouble();
 
-        return new HistogramDataPointImpl(timestamp, 7, bins, min, max, mean, sum);
+        return new HistogramDataPointImpl(timestamp, bins, min, max, mean, sum);
     }
 }

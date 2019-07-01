@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2017 SmartSheet.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ import javax.inject.Named;
 public final class DelegatingPercentileAggregator extends DelegatingRangeAggregator {
     @javax.validation.constraints.Min(0)
     @javax.validation.constraints.Max(1)
-    private double _percentile = -1d;
+    private double percentile = -1d;
 
     /**
      * Public constructor.
@@ -50,7 +50,7 @@ public final class DelegatingPercentileAggregator extends DelegatingRangeAggrega
     }
 
     public void setPercentile(final double percentile) {
-        _percentile = percentile;
+        this.percentile = percentile;
     }
 
     @Override
@@ -58,14 +58,14 @@ public final class DelegatingPercentileAggregator extends DelegatingRangeAggrega
         super.setProperties(aggregator);
         if (aggregator instanceof HistogramPercentileAggregator) {
             final HistogramPercentileAggregator histogramPercentileAggregator = (HistogramPercentileAggregator) aggregator;
-            histogramPercentileAggregator.setPercentile(_percentile);
+            histogramPercentileAggregator.setPercentile(percentile);
         } else if (aggregator instanceof PercentileAggregator) {
             final PercentileAggregator percentileAggregator = (PercentileAggregator) aggregator;
-            percentileAggregator.setPercentile(_percentile);
+            percentileAggregator.setPercentile(percentile);
         } else {
             try {
                 final PropertyDescriptor pd = new PropertyDescriptor("percentile", aggregator.getClass());
-                pd.getWriteMethod().invoke(aggregator, _percentile);
+                pd.getWriteMethod().invoke(aggregator, percentile);
             } catch (final IntrospectionException | InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

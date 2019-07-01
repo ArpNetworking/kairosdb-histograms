@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2018 Bruno Green.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ import java.util.NavigableMap;
         name = "hdev",
         description = "Computes the standard deviation value of the histograms.")
 public class HistogramStdDevAggregator extends RangeAggregator {
-    private final DoubleDataPointFactory _dataPointFactory;
+    private final DoubleDataPointFactory dataPointFactory;
 
     /**
      * Public constructor.
@@ -48,7 +48,7 @@ public class HistogramStdDevAggregator extends RangeAggregator {
      */
     @Inject
     public HistogramStdDevAggregator(final DoubleDataPointFactory dataPointFactory) throws KairosDBException {
-        _dataPointFactory = dataPointFactory;
+        this.dataPointFactory = dataPointFactory;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class HistogramStdDevAggregator extends RangeAggregator {
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return _dataPointFactory.getGroupType();
+        return dataPointFactory.getGroupType();
     }
 
     private final class HistogramStdDevDataPointAggregator implements RangeSubAggregator {
@@ -93,7 +93,7 @@ public class HistogramStdDevAggregator extends RangeAggregator {
                 }
             }
 
-            return Collections.singletonList(_dataPointFactory.createDataPoint(returnTime, Math.sqrt(m2 / (count - 1))));
+            return Collections.singletonList(dataPointFactory.createDataPoint(returnTime, Math.sqrt(m2 / (count - 1))));
         }
     }
 }

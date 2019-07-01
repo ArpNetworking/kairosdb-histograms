@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,19 +32,19 @@ import javax.inject.Named;
         name = "filter",
         description = "Filters datapoints according to filter operation with a null data point.")
 public class DelegatingFilterAggregator extends DelegatingAggregator {
-    private FilterAggregator.FilterOperation _filterop
+    private FilterAggregator.FilterOperation filterOp
             = FilterAggregator.FilterOperation.EQUAL;
-    private HistogramFilterAggregator.FilterIndeterminate _filterinc
+    private HistogramFilterAggregator.FilterIndeterminate filterinc
             = HistogramFilterAggregator.FilterIndeterminate.KEEP;
-    private double _threshold = 0.0;
+    private double threshold = 0.0;
 
     /**
      * Setter for filter operation.
      *
-     * @param filterop the filter operation
+     * @param filterOp the filter operation
      */
-    public void setFilterOp(final FilterAggregator.FilterOperation filterop) {
-        _filterop = filterop;
+    public void setFilterOp(final FilterAggregator.FilterOperation filterOp) {
+        this.filterOp = filterOp;
     }
 
     /**
@@ -53,7 +53,7 @@ public class DelegatingFilterAggregator extends DelegatingAggregator {
      * @param threshold the filter threshold
      */
     public void setThreshold(final double threshold) {
-        _threshold = threshold;
+        this.threshold = threshold;
     }
 
     /**
@@ -62,7 +62,7 @@ public class DelegatingFilterAggregator extends DelegatingAggregator {
      * @param inclusion the filter inclusion
      */
     public void setFilterIndeterminateInclusion(final HistogramFilterAggregator.FilterIndeterminate inclusion) {
-        _filterinc = inclusion;
+        filterinc = inclusion;
     }
 
     /**
@@ -81,14 +81,14 @@ public class DelegatingFilterAggregator extends DelegatingAggregator {
 
         if (aggregator instanceof HistogramFilterAggregator) {
             final HistogramFilterAggregator histogramFilterAggregator = (HistogramFilterAggregator) aggregator;
-            histogramFilterAggregator.setFilterOp(_filterop);
-            histogramFilterAggregator.setThreshold(_threshold);
-            histogramFilterAggregator.setFilterIndeterminateInclusion(_filterinc);
+            histogramFilterAggregator.setFilterOp(filterOp);
+            histogramFilterAggregator.setThreshold(threshold);
+            histogramFilterAggregator.setFilterIndeterminateInclusion(filterinc);
 
         } else if (aggregator instanceof FilterAggregator) {
             final FilterAggregator filterAggregator = (FilterAggregator) aggregator;
-            filterAggregator.setFilterOp(_filterop);
-            filterAggregator.setThreshold(_threshold);
+            filterAggregator.setFilterOp(filterOp);
+            filterAggregator.setThreshold(threshold);
 
         }
     }

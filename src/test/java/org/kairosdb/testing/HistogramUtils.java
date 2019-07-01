@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2019 Dropbox Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,7 @@ import java.util.TreeMap;
  */
 public final class HistogramUtils {
 
-    private HistogramUtils() {
-    }
+    private HistogramUtils() { }
 
     /**
      * Checks whether two data point groups made exclusively of histogram data points are equivalent.
@@ -127,7 +126,7 @@ public final class HistogramUtils {
         }
         final double mean = sum / count;
 
-        return new HistogramDataPointImpl(timeStamp, 7, bins, min, max, mean, sum);
+        return new HistogramDataPointImpl(timeStamp, bins, min, max, mean, sum);
     }
 
 }
