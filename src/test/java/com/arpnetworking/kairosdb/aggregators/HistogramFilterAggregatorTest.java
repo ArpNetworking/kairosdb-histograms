@@ -16,7 +16,7 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.HistogramDataPoint;
-import com.arpnetworking.kairosdb.HistogramDataPointImpl;
+import com.arpnetworking.kairosdb.HistogramDataPointV2Impl;
 import com.google.common.collect.Maps;
 import org.junit.Assert;
 import org.junit.Before;
@@ -111,7 +111,7 @@ public class HistogramFilterAggregatorTest {
             count++;
         }
         final double mean = sum / count;
-        return new HistogramDataPointImpl(timeStamp, 7, bins, min, max, mean, sum);
+        return new HistogramDataPointV2Impl(timeStamp, 7, bins, min, max, mean, sum);
     }
 
     private HistogramDataPoint createExactHistogram(final long timeStamp, final Double... values) {
@@ -128,7 +128,7 @@ public class HistogramFilterAggregatorTest {
             count++;
         }
         final double mean = sum / count;
-        return new HistogramDataPointImpl(timeStamp, 7, bins, min, max, mean, sum);
+        return new HistogramDataPointV2Impl(timeStamp, 7, bins, min, max, mean, sum);
     }
 
     private void runTest(final FilterAggregator.FilterOperation op,

@@ -43,6 +43,7 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
     private final double _sum;
     private final long _mask;
     private final int _finalMask;
+    private final Supplier<Long> _originalCountSupplier;
     private final Supplier<Long> _countSupplier;
 
     /**
@@ -74,7 +75,44 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
         _mask = 0xfff0000000000000L >> _precision;
         _finalMask = (1 << (_precision + 12)) - 1;
         _countSupplier = Suppliers.memoize(this::computeSampleCount);
+        _originalCountSupplier = Suppliers.memoize(_countSupplier);
     }
+
+    /**
+     * Public constructor.
+     *
+     * @param timestamp the timestamp.
+     * @param precision bucket precision, in bits
+     * @param map the bins with values
+     * @param min the minimum value in the histogram
+     * @param max the maximum value in the histogram
+     * @param mean the mean value in the histogram
+     * @param sum the sum of all the values in the histogram
+     * @param originalCount the original number of data points that this histogram represented
+     */
+    // CHECKSTYLE.OFF: ParameterNumber
+    public HistogramDataPointV2Impl(
+            final long timestamp,
+            final int precision,
+            final TreeMap<Double, Integer> map,
+            final double min,
+            final double max,
+            final double mean,
+            final double sum,
+            final long originalCount) {
+        super(timestamp);
+        _precision = precision;
+        _map = map;
+        _min = min;
+        _max = max;
+        _mean = mean;
+        _sum = sum;
+        _mask = 0xfff0000000000000L >> _precision;
+        _finalMask = (1 << (_precision + 12)) - 1;
+        _countSupplier = Suppliers.memoize(this::computeSampleCount);
+        _originalCountSupplier = Suppliers.ofInstance(originalCount);
+    }
+    // CHECKSTYLE.ON: ParameterNumber
 
     @Override
     public String toString() {
@@ -167,6 +205,12 @@ public class HistogramDataPointV2Impl extends DataPointHelper implements Histogr
         }
         return count;
     }
+
+    @Override
+    public long getOriginalCount() {
+        return _originalCountSupplier.get();
+    }
+
 
     @Override
     public int getPrecision() {

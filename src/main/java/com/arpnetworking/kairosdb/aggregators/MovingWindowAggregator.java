@@ -406,7 +406,7 @@ public class MovingWindowAggregator extends RangeAggregator {
         }
 
         @Override
-        public int getOriginalCount() {
+        public long getOriginalCount() {
             return _wrappedDataPoint.getOriginalCount();
         }
 

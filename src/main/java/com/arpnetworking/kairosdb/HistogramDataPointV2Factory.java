@@ -32,7 +32,7 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
- * Factory that creates {@link HistogramDataPointV1Impl}.
+ * Factory that creates {@link HistogramDataPointV2Impl}.
  *
  * @author Brandon Arp (brandon dot arp at smartsheet dot com)
  */

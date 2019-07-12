@@ -37,7 +37,7 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
     private final double _max;
     private final double _mean;
     private final double _sum;
-    private final int _originalCount;
+    private final long _originalCount;
 
     /**
      * Public constructor.
@@ -82,7 +82,7 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
      * @param originalCount the original number of data points that this histogram represented
      */
     // CHECKSTYLE.OFF: ParameterNumber
-    public HistogramDataPointImpl(
+    public HistogramDataPointV1Impl(
             final long timestamp,
             final int precision,
             final TreeMap<Double, Integer> map,
@@ -90,7 +90,7 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
             final double max,
             final double mean,
             final double sum,
-            final int originalCount) {
+            final long originalCount) {
         super(timestamp);
         _precision = precision;
         _map = map;
@@ -167,7 +167,7 @@ public class HistogramDataPointV1Impl extends DataPointHelper implements Histogr
     }
 
     @Override
-    public int getOriginalCount() {
+    public long getOriginalCount() {
         return _originalCount;
     }
 

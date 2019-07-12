@@ -104,7 +104,8 @@ public final class HistogramMergeAggregator extends RangeAggregator {
 
             final double mean = sum / count;
 
-            return Collections.singletonList(new HistogramDataPointV2Impl(returnTime, precision, merged, min, max, mean, sum, originalCount));
+            return Collections.singletonList(
+                    new HistogramDataPointV2Impl(returnTime, precision, merged, min, max, mean, sum, originalCount));
         }
     }
 }

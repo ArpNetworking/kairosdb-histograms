@@ -16,8 +16,8 @@
 package com.arpnetworking.kairosdb.aggregators;
 
 import com.arpnetworking.kairosdb.HistogramDataPoint;
-import com.arpnetworking.kairosdb.HistogramDataPointFactory;
-import com.arpnetworking.kairosdb.HistogramDataPointImpl;
+import com.arpnetworking.kairosdb.HistogramDataPointV2Factory;
+import com.arpnetworking.kairosdb.HistogramDataPointV2Impl;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.kairosdb.core.DataPoint;
@@ -127,12 +127,12 @@ public class HistogramFilterAggregator implements Aggregator {
 
     @Override
     public boolean canAggregate(final String groupType) {
-        return HistogramDataPointFactory.GROUP_TYPE.equals(groupType);
+        return HistogramDataPointV2Factory.GROUP_TYPE.equals(groupType);
     }
 
     @Override
     public String getAggregatedGroupType(final String groupType) {
-        return HistogramDataPointFactory.GROUP_TYPE;
+        return HistogramDataPointV2Factory.GROUP_TYPE;
     }
 
     static double truncate(final double val) {
@@ -207,7 +207,7 @@ public class HistogramFilterAggregator implements Aggregator {
             double max = -Double.MAX_VALUE;
             double sum = 0;
             long count = 0;
-            int originalCount = 0;
+            long originalCount = 0;
 
             if (dp instanceof HistogramDataPoint) {
                 final HistogramDataPoint hist = (HistogramDataPoint) dp;
@@ -233,7 +233,7 @@ public class HistogramFilterAggregator implements Aggregator {
                     }
                 }
             }
-            return new HistogramDataPointImpl(timeStamp, PRECISION, filtered, min, max,
+            return new HistogramDataPointV2Impl(timeStamp, PRECISION, filtered, min, max,
                     sum / count, sum, originalCount);
         }
 
